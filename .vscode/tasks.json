@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "setup-sample-folder",
+        "command": "./prepare_folders_for_running.sh",
+        "type": "shell",
+        "options": {
+            "cwd": "${workspaceFolder}/scripts"
+        }
+    }]
+}

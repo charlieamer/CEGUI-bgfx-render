@@ -1,4 +1,4 @@
-#include "GuiBgfxViewportTarget.h"
+#include "CeguiBgfxRenderer/CeguiBgfxViewportTarget.h"
 #include "CEGUI/Exceptions.h"
 
 namespace CEGUI 
@@ -22,4 +22,4 @@ namespace CEGUI
 	}
 }
 
-#include "GuiBgfxRenderTarget.inl"
+#include "CeguiBgfxRenderTarget.inl"

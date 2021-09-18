@@ -1,9 +1,8 @@
-#include "GuiBgfxRenderTarget.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderTarget.h"
 #include "CEGUI/RenderQueue.h"
-#include "GuiBgfxGeometry.h"
+#include "CeguiBgfxRenderer/CeguiBgfxGeometry.h"
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
-#include <debugdraw/DebugDrawImplentation.h>
 
 namespace CEGUI
 {
@@ -63,17 +62,11 @@ namespace CEGUI
 		if (!d_matrixValid)
 			updateMatrix();
 		
-		DebugDrawImplentation temp;
 		bgfx::setViewTransform(d_owner.getViewID(), d_matrix, d_ortho);
 		bgfx::setViewRect(d_owner.getViewID(), 0, 0, d_area.getWidth(), d_area.getHeight());
 		//bgfx::setViewRect(d_owner.getViewID(), 0, 0, 1040, 480);
 		//bgfx::setPaletteColor(d_owner.getViewID(), (uint32_t)0x00000000);
 		bgfx::setViewClear(d_owner.getViewID(), 0);
-		temp.begin(1);
-		float mtx[16];
-		bx::mtxMul(mtx, d_matrix, d_ortho);
-		temp.drawFrustum(mtx);
-		temp.close();
 	}
 
 	template <typename T>
@@ -115,8 +108,8 @@ namespace CEGUI
 		bx::Vec3 in{ 0.0 };
 
 		// unproject the ends of the ray
-		bx::Vec3 r1;
-		bx::Vec3 r2;
+		bx::Vec3 r1(0, 0, 0);
+		bx::Vec3 r2(0, 0, 0);
 		in.x = vp[2] * 0.5;
 		in.y = vp[3] * 0.5;
 		in.z = -d_viewDistance;
@@ -137,9 +130,9 @@ namespace CEGUI
 			&r2);
 
 		// project points to orientate them with GeometryBuffer plane
-		bx::Vec3 p1;
-		bx::Vec3 p2;
-		bx::Vec3 p3;
+		bx::Vec3 p1(0, 0, 0);
+		bx::Vec3 p2(0, 0, 0);
+		bx::Vec3 p3(0, 0, 0);
 		in.x = 0.0;
 		in.y = 0.0;
 		bgfxProject(in, gb_matrixd, d_matrixd, vp,

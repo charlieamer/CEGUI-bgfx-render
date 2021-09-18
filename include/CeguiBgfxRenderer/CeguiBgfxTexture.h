@@ -2,7 +2,7 @@
 #include <CEGUI/CEGUI.h>
 #include <bgfx/bgfx.h>
 #include <bx/allocator.h>
-#include "GuiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 
 
 namespace CEGUI 
@@ -28,7 +28,6 @@ namespace CEGUI
 		void destroy();
 
 		bgfx::TextureHandle getHandle() const;
-		void setAllocator(bx::AllocatorI * alloc);
 	protected:
 		String name;
 		Sizef size;
@@ -36,7 +35,6 @@ namespace CEGUI
 		mutable bgfx::TextureHandle handle;
 		unsigned char* data;
 		void setSize(const Sizef & value);
-		bx::AllocatorI* allocator;
 
 	
 	};

@@ -1,9 +1,9 @@
 #pragma once
 #include <CEGUI/CEGUI.h>
-#include "GuiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 #include <vector>
-#include "GuiBgfxTexture.h"
-#include "spdlog/fmt/ostr.h" // must be included
+#include "CeguiBgfxRenderer/CeguiBgfxTexture.h"
+#include <bgfx/bgfx.h>
 
 //using namespace std;
 
@@ -91,7 +91,7 @@ namespace CEGUI {
 
 		GuiBgfxRenderer& owner;
 
-		bgfx::VertexDecl decl;
+		bgfx::VertexLayout vertexLayout;
 
 		mutable bool d_matrixValid;
 

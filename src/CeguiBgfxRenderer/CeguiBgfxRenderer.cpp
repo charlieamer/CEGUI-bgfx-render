@@ -1,8 +1,9 @@
-#include "GuiBgfxRenderer.h"
-#include "GuiBgfxGeometry.h"
-#include "GuiBgfxTextureTarget.h"
-#include "GuiBgfxViewportTarget.h"
-#include <Util.h>
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxGeometry.h"
+#include "CeguiBgfxRenderer/CeguiBgfxTextureTarget.h"
+#include "CeguiBgfxRenderer/CeguiBgfxViewportTarget.h"
+#include "fs_textured.bin.h"
+#include "vs_textured.bin.h"
 #include <bx/file.h>
 #include <bgfx/bgfx.h>
 class FileReader : public bx::FileReader
@@ -22,75 +23,28 @@ namespace CEGUI
 {
 	static bx::DefaultAllocator defaultAlloc;
 
-	static const bgfx::Memory* loadMem(bx::FileReaderI* _reader, const char* _filePath)
+	static const bgfx::Memory* loadMem(const unsigned char* data)
 	{
-		if (bx::open(_reader, _filePath))
-		{
-			uint32_t size = (uint32_t)bx::getSize(_reader);
-			const bgfx::Memory* mem = bgfx::alloc(size + 1);
-			bx::read(_reader, mem->data, size);
-			bx::close(_reader);
-			mem->data[mem->size - 1] = '\0';
-			return mem;
-		}
-
-		//DBG("Failed to load %s.", _filePath);
-		return NULL;
+		return bgfx::makeRef(data, strlen((const char*)data) + 1);
 	}
 
-	static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name)
+	static bgfx::ShaderHandle loadShader(const unsigned char* data, const char* name)
 	{
-		char filePath[512];
+		bgfx::ShaderHandle handle = bgfx::createShader(loadMem(data));;
 
-		const char* shaderPath = "???";
-
-		switch (bgfx::getRendererType())
-		{
-		case bgfx::RendererType::Noop:
-		case bgfx::RendererType::Direct3D9:  shaderPath = "shaders/dx9/";   break;
-		case bgfx::RendererType::Direct3D11:
-		case bgfx::RendererType::Direct3D12: shaderPath = "shaders/dx11/";  break;
-		case bgfx::RendererType::Gnm:        shaderPath = "shaders/pssl/";  break;
-		case bgfx::RendererType::Metal:      shaderPath = "shaders/metal/"; break;
-		case bgfx::RendererType::OpenGL:     shaderPath = "shaders/glsl/";  break;
-		case bgfx::RendererType::OpenGLES:   shaderPath = "shaders/essl/";  break;
-		case bgfx::RendererType::Vulkan:     shaderPath = "shaders/spirv/"; break;
-
-		case bgfx::RendererType::Count:
-			BX_CHECK(false, "You should not be here!");
-			break;
-		}
-
-		bx::strCopy(filePath, BX_COUNTOF(filePath), shaderPath);
-		bx::strCat(filePath, BX_COUNTOF(filePath), _name);
-		bx::strCat(filePath, BX_COUNTOF(filePath), ".bin");
-		bgfx::ShaderHandle handle = bgfx::createShader(loadMem(_reader, filePath));;
-
-
-		bgfx::setName(handle, filePath);
+		bgfx::setName(handle, name);
 
 		return handle;
 	}
 
 
-	GuiBgfxRenderer::GuiBgfxRenderer(const char* vsFileLocation, const char* fsFileLocation)
+	GuiBgfxRenderer::GuiBgfxRenderer()
 	{
 		//d_renderBuffers.push_back(new GuiBgfxRenderTarget(*this));
-		d_allocator = &defaultAlloc;
 		const bgfx::Stats* temp = bgfx::getStats();
 
-		//bx::FileReaderI* s_fileReader = 
-		//	BX_NEW(d_allocator, FileReader);;
-
-		//bgfx::ShaderHandle vsh = loadShader(s_fileReader, vsFileLocation);
-		//bgfx::ShaderHandle fsh = BGFX_INVALID_HANDLE;
-		//if (NULL != fsFileLocation)
-		//{
-		//	fsh = loadShader(s_fileReader, fsFileLocation);
-		//}
-
-		//d_program = bgfx::createProgram(vsh, fsh, true /* destroy shaders when program is destroyed */);
-		d_program = loadProgram(vsFileLocation, fsFileLocation);
+		bgfx::ShaderHandle vsh = loadShader(vs_textured_bin, "CEGUI VS Textured");
+		bgfx::ShaderHandle fsh = loadShader(fs_textured_bin, "CEGUI FS Textured");
 		d_textureUniform = bgfx::createUniform("s_texture0", bgfx::UniformType::Sampler);
 		updateScreenSize(bgfx::getStats()->width, bgfx::getStats()->height);
 
@@ -103,17 +57,17 @@ namespace CEGUI
 		d_defaultTarget = new GuiBgfxViewportTarget(*this);
 	}
 
-	GuiBgfxRenderer & GuiBgfxRenderer::bootstrapSystem(const char* vsFileLocation, const char* fsFileLocation)
+	GuiBgfxRenderer & GuiBgfxRenderer::bootstrapSystem()
 	{
-		GuiBgfxRenderer& renderer(create(vsFileLocation, fsFileLocation));
+		GuiBgfxRenderer& renderer(create());
 
 		DefaultResourceProvider* rp = new DefaultResourceProvider();
 		System::create(renderer, rp);
 		return renderer;
 	}
 
-	GuiBgfxRenderer& GuiBgfxRenderer::create(const char* vsFileLocation, const char* fsFileLocation) {
-		return *new GuiBgfxRenderer(vsFileLocation, fsFileLocation);
+	GuiBgfxRenderer& GuiBgfxRenderer::create() {
+		return *new GuiBgfxRenderer();
 	}
 
 	void GuiBgfxRenderer::destroy()
@@ -199,7 +153,6 @@ namespace CEGUI
 	Texture & GuiBgfxRenderer::createTexture(const String & name)
 	{
 		GuiBgfxTexture* ret = new GuiBgfxTexture(name);
-		ret->setAllocator(d_allocator);
 		d_textures[name.c_str()] = ret;
 		return *ret;
 	}
@@ -207,7 +160,6 @@ namespace CEGUI
 	Texture & GuiBgfxRenderer::createTexture(const String & name, const String & filename, const String & resourceGroup)
 	{
 		GuiBgfxTexture *ret = (GuiBgfxTexture*)&createTexture(name);
-		ret->setAllocator(d_allocator);
 		ret->loadFromFile(filename, resourceGroup);
 		return *ret;
 	}
@@ -302,11 +254,6 @@ namespace CEGUI
 	//{
 	//	activateTarget(*d_renderBuffers.begin());
 	//}
-
-	void GuiBgfxRenderer::setAllocator(bx::AllocatorI * alloc)
-	{
-		d_allocator = alloc;
-	}
 
 	bgfx::ViewId GuiBgfxRenderer::getViewID() const
 	{

@@ -1,11 +1,11 @@
 #pragma once
-#include "GuiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 #include "CEGUI/TextureTarget.h"
-#include "GuiBgfxRenderTarget.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderTarget.h"
 #include "CEGUI/Rect.h"
 #include <bgfx/bgfx.h>
 
-#include "GuiBgfxTexture.h"
+#include "CeguiBgfxRenderer/CeguiBgfxTexture.h"
 namespace CEGUI
 {
 	class GuiBgfxTextureTarget : /*public TextureTarget,*/ public GuiBgfxRenderTarget<TextureTarget>

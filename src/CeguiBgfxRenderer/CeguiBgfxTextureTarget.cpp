@@ -1,4 +1,4 @@
-#include "GuiBgfxTextureTarget.h"
+#include "CeguiBgfxRenderer/CeguiBgfxTextureTarget.h"
 #include "CEGUI/Exceptions.h"
 #include "CEGUI/RenderQueue.h"
 #include "CEGUI/GeometryBuffer.h"
@@ -70,4 +70,4 @@ namespace CEGUI
 	}
 }
 
-#include "GuiBgfxRenderTarget.inl"
+#include "CeguiBgfxRenderTarget.inl"

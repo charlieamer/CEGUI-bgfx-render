@@ -24,8 +24,8 @@ namespace CEGUI
 	class GuiBgfxRenderer : public Renderer//, public Singleton<GuiBgfxRenderer>
 	{
 	public:
-		static GuiBgfxRenderer& bootstrapSystem(const char* vsFileLocation, const char* fsFileLocation);
-		static GuiBgfxRenderer& create(const char* vsFileLocation, const char* fsFileLocation);
+		static GuiBgfxRenderer& bootstrapSystem();
+		static GuiBgfxRenderer& create();
 
 		void destroy();
 		void updateScreenSize(int width, int height);
@@ -60,7 +60,6 @@ namespace CEGUI
 		//void activateTarget(GuiBgfxRenderTarget* target);
 		//void activateRenderTarget();
 		 
-		void setAllocator(bx::AllocatorI* alloc);
 		bgfx::ViewId getViewID() const;
 		void setViewID(bgfx::ViewId value) { d_viewId = value; };
 
@@ -103,9 +102,8 @@ namespace CEGUI
 
 		bgfx::ProgramHandle d_program;
 		bgfx::UniformHandle d_textureUniform;
-		bx::AllocatorI* d_allocator;
 
-		GuiBgfxRenderer(const char* vsFileLocation, const char* fsFileLocation);
+		GuiBgfxRenderer();
 
 		
 	};

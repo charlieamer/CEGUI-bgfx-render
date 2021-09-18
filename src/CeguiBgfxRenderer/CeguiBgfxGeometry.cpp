@@ -1,6 +1,6 @@
 
-#include "GuiBgfxGeometry.h"
-#include "GuiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxGeometry.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 
 #include <bx/math.h>
 #include <iostream>
@@ -27,13 +27,13 @@ namespace CEGUI
 		d_effect = NULL;
 		d_activeTexture = NULL;
 
-		decl.begin()
+		vertexLayout.begin()
 			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, true)
 			.end();
 
-		vertexHandle = bgfx::createDynamicVertexBuffer(10, decl, BGFX_BUFFER_ALLOW_RESIZE);
+		vertexHandle = bgfx::createDynamicVertexBuffer(10, vertexLayout, BGFX_BUFFER_ALLOW_RESIZE);
 
 	}
 

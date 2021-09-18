@@ -1,5 +1,5 @@
 #pragma once
-#include "GuiBgfxRenderer.h"
+#include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 #include "CEGUI/RenderTarget.h"
 #include "CEGUI/Rect.h"
 
