@@ -15,7 +15,7 @@ namespace CEGUI
 	class CeguiBgfxTexture;
 	class CeguiBgfxTextureTarget;
 	class CeguiBgfxGeometry;
-
+	class CeguiBgfxViewportTarget;
 
 	class CeguiBgfxRenderer : public Renderer//, public Singleton<CeguiBgfxRenderer>
 	{
@@ -53,11 +53,10 @@ namespace CEGUI
 		virtual uint getMaxTextureSize() const override;
 		virtual const String & getIdentifierString() const override;
 
-		//void activateTarget(CeguiBgfxRenderTarget* target);
-		//void activateRenderTarget();
-		 
-		bgfx::ViewId getViewID() const;
-		void setViewID(bgfx::ViewId value) { d_viewId = value; };
+		void activateTarget(RenderTarget* target);
+
+		unsigned char createNewViewID();
+		unsigned char getActiveViewID();
 
 	private:
 		//! helper to throw exception if name is already used.
@@ -71,37 +70,23 @@ namespace CEGUI
 		//Sizef screenSize;
 		//! What the renderer considers to be the current display size.
 		Sizef d_displaySize;
-		//! What the renderer considers to be the current display DPI resolution.
-		Vector2f d_displayDPI;
-		//! Container type to hold texture Targets
-		typedef std::vector<CeguiBgfxTexture*> TextureTargetList;
 		//! Container used to track Texture Targets
-		TextureTargetList d_textureTargets;
-		//! Container type to hold Geomitry Buffers
-		typedef std::vector<CeguiBgfxGeometry*> GeometryBufferList;
+		std::vector<CeguiBgfxTextureTarget*> d_textureTargets;
 		//! Container used to track geomitryBuffers
-		GeometryBufferList d_geometryBuffers;
+		std::vector<CeguiBgfxGeometry*> d_geometryBuffers;
 		//! The Default RenderTareget
-		RenderTarget* d_defaultTarget = nullptr;
-
-		//! Container type to hold  render Targets
-		//typedef std::vector<CeguiBgfxRenderTarget*> RenderTargetList;
-		////! Container used to track render targets
-		//RenderTargetList d_renderBuffers;
-		//! Container type to hold textures
+		CeguiBgfxViewportTarget* d_defaultTarget;
 		typedef std::map<String, CeguiBgfxTexture*, StringFastLessCompare
 					CEGUI_MAP_ALLOC(String, CeguiBgfxTexture*)> TextureMap;
 		
 		TextureMap d_textures;
 
-		bgfx::ViewId d_viewId;
-
 		bgfx::ProgramHandle d_program;
 		bgfx::UniformHandle d_textureUniform;
 
-		CeguiBgfxRenderer();
+		RenderTarget* d_activeRenderTarget;
 
-		
+		CeguiBgfxRenderer();
 	};
 }
 #if defined(_MSC_VER)

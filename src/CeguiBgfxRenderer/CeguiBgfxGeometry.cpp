@@ -92,7 +92,7 @@ namespace CEGUI
 					bgfx::setTexture(0, uniform, BGFX_INVALID_HANDLE);
 				}
 				bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA);
-				bgfx::submit(owner.getViewID(), program);
+				bgfx::submit(owner.getActiveViewID(), program);
 				pos += i->vertexCount;
 			}
 		}

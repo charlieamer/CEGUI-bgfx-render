@@ -11,7 +11,6 @@ namespace CEGUI
 	class CeguiBgfxTextureTarget : /*public TextureTarget,*/ public CeguiBgfxRenderTarget<TextureTarget>
 	{
 		bgfx::FrameBufferHandle handle;
-		const bgfx::Memory* textureMemory;
 	public:
 		CeguiBgfxTextureTarget(CeguiBgfxRenderer& owner);
 		~CeguiBgfxTextureTarget();

@@ -26,7 +26,7 @@ namespace CEGUI
 		virtual void unprojectPoint(const GeometryBuffer & buff, const Vector2f & p_in, Vector2f & p_out) const override;
 
 		void setViewId(uint8_t value) { d_viewId = value; }
-		uint8_t getViewId() { return d_viewId; }
+		uint8_t getViewId() const { return d_viewId; }
 	protected:
 		//! helper that initialises the cached matrix
 		virtual void updateMatrix() const;

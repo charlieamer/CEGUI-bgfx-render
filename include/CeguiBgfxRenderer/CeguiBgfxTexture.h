@@ -28,6 +28,7 @@ namespace CEGUI
 		void destroy();
 
 		bgfx::TextureHandle getHandle() const;
+		void setHandle(bgfx::TextureHandle newHandle);
 	protected:
 		String name;
 		Sizef size;
@@ -35,8 +36,6 @@ namespace CEGUI
 		mutable bgfx::TextureHandle handle;
 		unsigned char* data;
 		void setSize(const Sizef & value);
-
-	
 	};
 
 }

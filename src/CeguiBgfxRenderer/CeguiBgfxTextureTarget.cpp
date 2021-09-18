@@ -9,7 +9,9 @@ namespace CEGUI
 {
 	CeguiBgfxTextureTarget::CeguiBgfxTextureTarget(CeguiBgfxRenderer& owner) : CeguiBgfxRenderTarget(owner)
 	{
-		texture = NULL;
+		char tmp[30];
+		sprintf(tmp, "Texture render target - %u", getViewId());
+		texture = static_cast<CEGUI::CeguiBgfxTexture*>(&owner.createTexture(tmp));
 	}
 
 	CeguiBgfxTextureTarget::~CeguiBgfxTextureTarget()
@@ -24,16 +26,17 @@ namespace CEGUI
 	void CeguiBgfxTextureTarget::activate()
 	{
 		bgfx::setViewFrameBuffer(getViewId(), handle);
+		CeguiBgfxRenderTarget::activate();
 	}
 
 	void CeguiBgfxTextureTarget::deactivate()
 	{
+		CeguiBgfxRenderTarget::deactivate();
 	}
 
 	void CeguiBgfxTextureTarget::clear()
 	{
-		memset(textureMemory->data, 0, textureMemory->size);
-		bgfx::updateTexture2D(texture->getHandle(), 0, 0, 0, 0, texture->getSize().d_width, texture->getSize().d_height, textureMemory);
+		// TODO: Implement this
 	}
 	Texture & CeguiBgfxTextureTarget::getTexture() const
 	{
@@ -42,17 +45,8 @@ namespace CEGUI
 
 	void CeguiBgfxTextureTarget::declareRenderSize(const Sizef & sz)
 	{
-		/*
-		if (texture) {
-			CEGUI_THROW(new RendererException("Texture for render target alredy initialized"));
-		}
-		texture = new CeguiBgfxTexture("Texture render target");
-		uint8_t* data = new uint8_t[sz.d_width * sz.d_height * 4];
-		textureMemory = bgfx::makeRef(data, sz.d_height * sz.d_width * 4);
-		texture->loadFromMemory(textureMemory, sz, Texture::PixelFormat::PF_RGBA);
-		*/
 		handle = bgfx::createFrameBuffer(sz.d_width, sz.d_height, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT_WRITE_ONLY);
-		d_area = Rectf(0, 0, sz.d_width, sz.d_height);
+		d_area = Rectf({0, 0}, sz);
 	}
 
 	bool CeguiBgfxTextureTarget::isRenderingInverted() const
@@ -64,7 +58,6 @@ namespace CEGUI
 	{
 		if (texture) {
 			texture->destroy();
-			delete textureMemory->data;
 		}
 		bgfx::destroy(handle);
 	}

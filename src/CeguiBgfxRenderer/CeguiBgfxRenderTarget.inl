@@ -10,30 +10,29 @@ namespace CEGUI
 	const double CeguiBgfxRenderTarget<T>::d_yfov_tan = 0.267949192431123;
 
 	template <typename T>
-	CeguiBgfxRenderTarget<T>::CeguiBgfxRenderTarget(CeguiBgfxRenderer& owner) :
-		d_owner(owner),
-		d_area(0, 0, 0, 0),
-		d_viewDistance(0),
-		d_matrixValid(false),
-		d_matrix{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+	CeguiBgfxRenderTarget<T>::CeguiBgfxRenderTarget(CeguiBgfxRenderer &owner) : d_owner(owner),
+																				d_area(0, 0, 0, 0),
+																				d_viewDistance(0),
+																				d_matrixValid(false),
+																				d_matrix{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+																				d_viewId(owner.createNewViewID())
 	{
-		
 	}
 
 	template <typename T>
-	void CeguiBgfxRenderTarget<T>::draw(const GeometryBuffer & buffer)
+	void CeguiBgfxRenderTarget<T>::draw(const GeometryBuffer &buffer)
 	{
 		buffer.draw();
 	}
 
 	template <typename T>
-	void CeguiBgfxRenderTarget<T>::draw(const RenderQueue & queue)
+	void CeguiBgfxRenderTarget<T>::draw(const RenderQueue &queue)
 	{
 		queue.draw();
 	}
 
 	template <typename T>
-	void CeguiBgfxRenderTarget<T>::setArea(const Rectf & area)
+	void CeguiBgfxRenderTarget<T>::setArea(const Rectf &area)
 	{
 		d_area = area;
 		d_matrixValid = false;
@@ -44,7 +43,7 @@ namespace CEGUI
 	}
 
 	template <typename T>
-	const Rectf & CeguiBgfxRenderTarget<T>::getArea() const
+	const Rectf &CeguiBgfxRenderTarget<T>::getArea() const
 	{
 		return d_area;
 	}
@@ -58,54 +57,46 @@ namespace CEGUI
 	template <typename T>
 	void CeguiBgfxRenderTarget<T>::activate()
 	{
-		//d_owner.activateTarget(this);
+		d_owner.activateTarget(this);
 		if (!d_matrixValid)
 			updateMatrix();
-		
-		bgfx::setViewTransform(d_owner.getViewID(), d_matrix, d_ortho);
-		bgfx::setViewRect(d_owner.getViewID(), 0, 0, d_area.getWidth(), d_area.getHeight());
-		//bgfx::setViewRect(d_owner.getViewID(), 0, 0, 1040, 480);
-		//bgfx::setPaletteColor(d_owner.getViewID(), (uint32_t)0x00000000);
-		bgfx::setViewClear(d_owner.getViewID(), 0);
+
+		bgfx::setViewTransform(d_viewId, d_matrix, d_ortho);
+		bgfx::setViewRect(d_viewId, 0, 0, d_area.getWidth(), d_area.getHeight());
+		bgfx::setViewClear(d_viewId, 0);
 	}
 
 	template <typename T>
 	void CeguiBgfxRenderTarget<T>::deactivate()
 	{
 	}
+
 	static bool bgfxunProject(bx::Vec3 win,
-		const float modelMatrix[16],
-		const float projMatrix[16],
-		const float viewport[4],
-		bx::Vec3 *obj);
+							  const float modelMatrix[16],
+							  const float projMatrix[16],
+							  const float viewport[4],
+							  bx::Vec3 *obj);
 	static bool bgfxProject(bx::Vec3 obj,
-		const float modelMatrix[16],
-		const float projMatrix[16],
-		const float viewport[4],
-		bx::Vec3 *win);
-
-
-
-
-
+							const float modelMatrix[16],
+							const float projMatrix[16],
+							const float viewport[4],
+							bx::Vec3 *win);
 
 	template <typename T>
-	void CeguiBgfxRenderTarget<T>::unprojectPoint(const GeometryBuffer & buff, const Vector2f & p_in, Vector2f & p_out) const
+	void CeguiBgfxRenderTarget<T>::unprojectPoint(const GeometryBuffer &buff, const Vector2f &p_in, Vector2f &p_out) const
 	{
 		if (!d_matrixValid)
 			updateMatrix();
 
-
-		const CeguiBgfxGeometry& gb = static_cast<const CeguiBgfxGeometry&>(buff);
+		const CeguiBgfxGeometry &gb = static_cast<const CeguiBgfxGeometry &>(buff);
 
 		const float vp[4] = {
 			static_cast<float>(d_area.left()),
 			static_cast<float>(d_area.top()),
 			static_cast<float>(d_area.getWidth()),
-			static_cast<float>(d_area.getHeight())
-		};
+			static_cast<float>(d_area.getHeight())};
 
-		bx::Vec3 in{ 0.0 };
+		bx::Vec3 in{0.0};
 
 		// unproject the ends of the ray
 		bx::Vec3 r1(0, 0, 0);
@@ -121,13 +112,11 @@ namespace CEGUI
 			d_matrixd[i] = d_matrix[i];
 		}
 
-		bgfxunProject(in, gb_matrixd, d_matrixd, vp,
-			&r1);
+		bgfxunProject(in, gb_matrixd, d_matrixd, vp, &r1);
 		in.x = p_in.d_x;
 		in.y = vp[3] - p_in.d_y;
 		in.z = 0.0;
-		bgfxunProject(in, gb_matrixd, d_matrixd, vp,
-			&r2);
+		bgfxunProject(in, gb_matrixd, d_matrixd, vp, &r2);
 
 		// project points to orientate them with GeometryBuffer plane
 		bx::Vec3 p1(0, 0, 0);
@@ -136,15 +125,15 @@ namespace CEGUI
 		in.x = 0.0;
 		in.y = 0.0;
 		bgfxProject(in, gb_matrixd, d_matrixd, vp,
-			&p1);
+					&p1);
 		in.x = 1.0;
 		in.y = 0.0;
 		bgfxProject(in, gb_matrixd, d_matrixd, vp,
-			&p2);
+					&p2);
 		in.x = 0.0;
 		in.y = 1.0;
 		bgfxProject(in, gb_matrixd, d_matrixd, vp,
-			&p3);
+					&p3);
 
 		// calculate vectors for generating the plane
 		const double pv1_x = p2.x - p1.x;
@@ -179,7 +168,6 @@ namespace CEGUI
 		p_out.d_y = static_cast<float>(is_y);
 		//Inverse of Render view and geometry buffer then an intersect of the plain
 		//bx::mulH(input, static_cast<CeguiBgfxGeometry*>(buff*) .getInvMatrix);
-
 	}
 
 	template <typename T>
@@ -187,28 +175,30 @@ namespace CEGUI
 	{
 		const int w = d_area.getWidth();
 		const int h = d_area.getHeight();
+		if (!h) {
+			CEGUI::Logger::getSingleton().logEvent("Tried to activate render target before its size was declared", CEGUI::LoggingLevel::Warnings);
+			return;
+		}
 		const float aspect = w / h;
 		const float midx = w * 0.5;
 		const float midy = h * 0.5;
 		d_viewDistance = midx / (aspect * d_yfov_tan);
-		bx::mtxOrtho(d_ortho, -w / 2.0f, w/2.0f, h / 2.0f, -h / 2.0f, 0, d_viewDistance*2.0f, 0, false);
+		bx::mtxOrtho(d_ortho, -w / 2.0f, w / 2.0f, h / 2.0f, -h / 2.0f, 0, d_viewDistance * 2.0f, 0, false);
 
-		bx::Vec3 at{ midx, midy, 0.0f };
-		bx::Vec3 eye{ midx, midy, (float)-d_viewDistance };
-		bx::Vec3 up{ 0.0f, 1.0f, 0.0f };
+		bx::Vec3 at{midx, midy, 0.0f};
+		bx::Vec3 eye{midx, midy, (float)-d_viewDistance};
+		bx::Vec3 up{0.0f, 1.0f, 0.0f};
 
 		bx::mtxLookAt(d_matrix, eye, at, up);
 
-
-		
 		d_matrixValid = true;
 	}
 
 	bool bgfxunProject(bx::Vec3 win,
-		const float modelMatrix[16],
-		const float projMatrix[16],
-		const float viewport[4],
-		bx::Vec3 *obj)
+					   const float modelMatrix[16],
+					   const float projMatrix[16],
+					   const float viewport[4],
+					   bx::Vec3 *obj)
 	{
 		float finalMatrix[16];
 		float in[4];
@@ -231,7 +221,8 @@ namespace CEGUI
 		in[1] = in[1] * 2 - 1;
 		in[2] = in[2] * 2 - 1;
 		bx::vec4MulMtx(out, in, finalMatrix);
-		if (out[3] == 0.0) return(false);
+		if (out[3] == 0.0)
+			return (false);
 		out[0] /= out[3];
 		out[1] /= out[3];
 		out[2] /= out[3];
@@ -239,14 +230,14 @@ namespace CEGUI
 		(*obj).x = out[0];
 		(*obj).y = out[1];
 		(*obj).z = out[2];
-		return(true);
+		return (true);
 	}
 
 	bool bgfxProject(bx::Vec3 obj,
-		const float modelMatrix[16],
-		const float projMatrix[16],
-		const float viewport[4],
-		bx::Vec3 *win)
+					 const float modelMatrix[16],
+					 const float projMatrix[16],
+					 const float viewport[4],
+					 bx::Vec3 *win)
 	{
 		float in[4];
 		float out[4];
@@ -258,7 +249,8 @@ namespace CEGUI
 		bx::vec4MulMtx(out, in, modelMatrix);
 		bx::vec4MulMtx(in, out, modelMatrix);
 
-		if (in[3] == 0.0) return(false);
+		if (in[3] == 0.0)
+			return (false);
 		in[0] /= in[3];
 		in[1] /= in[3];
 		in[2] /= in[3];
@@ -274,6 +266,6 @@ namespace CEGUI
 		(*win).x = in[0];
 		(*win).y = in[1];
 		(*win).z = in[2];
-		return(true);
+		return (true);
 	}
 }

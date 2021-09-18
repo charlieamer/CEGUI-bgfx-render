@@ -50,7 +50,7 @@ endif()
 if(CeguiBgfxRenderer_BUILD_SAMPLES)
 	set(CeguiBgfxRenderer_CEGUI_ORIGINAL_SOURCE_DIR "${CeguiBgfxRenderer_CEGUI_INCLUDE_PATH}/../..")
 	set(CeguiBgfxRenderer_CEGUI_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/cegui")
-	set(CeguiBgfxRenderer_BUILD_SHARED ON)
+	set(CeguiBgfxRenderer_BUILD_SHARED ON CACHE BOOL "OVERRIDEN" FORCE)
 
 	# Samples dependencies
 	find_package(glfw3 REQUIRED)
