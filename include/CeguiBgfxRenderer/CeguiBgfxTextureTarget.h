@@ -8,13 +8,13 @@
 #include "CeguiBgfxRenderer/CeguiBgfxTexture.h"
 namespace CEGUI
 {
-	class GuiBgfxTextureTarget : /*public TextureTarget,*/ public GuiBgfxRenderTarget<TextureTarget>
+	class CeguiBgfxTextureTarget : /*public TextureTarget,*/ public CeguiBgfxRenderTarget<TextureTarget>
 	{
 		bgfx::FrameBufferHandle handle;
 		const bgfx::Memory* textureMemory;
 	public:
-		GuiBgfxTextureTarget(GuiBgfxRenderer& owner);
-		~GuiBgfxTextureTarget();
+		CeguiBgfxTextureTarget(CeguiBgfxRenderer& owner);
+		~CeguiBgfxTextureTarget();
 
 		// Inherited via TextureTarget
 		virtual bool isImageryCache() const override;
@@ -25,7 +25,7 @@ namespace CEGUI
 		virtual void declareRenderSize(const Sizef & sz) override;
 		virtual bool isRenderingInverted() const override;
 
-		GuiBgfxTexture* texture;
+		CeguiBgfxTexture* texture;
 		virtual void destroy() override;
 	};
 

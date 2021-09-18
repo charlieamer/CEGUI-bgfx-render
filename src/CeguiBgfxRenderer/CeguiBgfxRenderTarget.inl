@@ -7,10 +7,10 @@
 namespace CEGUI
 {
 	template <typename T>
-	const double GuiBgfxRenderTarget<T>::d_yfov_tan = 0.267949192431123;
+	const double CeguiBgfxRenderTarget<T>::d_yfov_tan = 0.267949192431123;
 
 	template <typename T>
-	GuiBgfxRenderTarget<T>::GuiBgfxRenderTarget(GuiBgfxRenderer& owner) :
+	CeguiBgfxRenderTarget<T>::CeguiBgfxRenderTarget(CeguiBgfxRenderer& owner) :
 		d_owner(owner),
 		d_area(0, 0, 0, 0),
 		d_viewDistance(0),
@@ -21,19 +21,19 @@ namespace CEGUI
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::draw(const GeometryBuffer & buffer)
+	void CeguiBgfxRenderTarget<T>::draw(const GeometryBuffer & buffer)
 	{
 		buffer.draw();
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::draw(const RenderQueue & queue)
+	void CeguiBgfxRenderTarget<T>::draw(const RenderQueue & queue)
 	{
 		queue.draw();
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::setArea(const Rectf & area)
+	void CeguiBgfxRenderTarget<T>::setArea(const Rectf & area)
 	{
 		d_area = area;
 		d_matrixValid = false;
@@ -44,19 +44,19 @@ namespace CEGUI
 	}
 
 	template <typename T>
-	const Rectf & GuiBgfxRenderTarget<T>::getArea() const
+	const Rectf & CeguiBgfxRenderTarget<T>::getArea() const
 	{
 		return d_area;
 	}
 
 	template <typename T>
-	bool GuiBgfxRenderTarget<T>::isImageryCache() const
+	bool CeguiBgfxRenderTarget<T>::isImageryCache() const
 	{
 		return false;
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::activate()
+	void CeguiBgfxRenderTarget<T>::activate()
 	{
 		//d_owner.activateTarget(this);
 		if (!d_matrixValid)
@@ -70,7 +70,7 @@ namespace CEGUI
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::deactivate()
+	void CeguiBgfxRenderTarget<T>::deactivate()
 	{
 	}
 	static bool bgfxunProject(bx::Vec3 win,
@@ -90,13 +90,13 @@ namespace CEGUI
 
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::unprojectPoint(const GeometryBuffer & buff, const Vector2f & p_in, Vector2f & p_out) const
+	void CeguiBgfxRenderTarget<T>::unprojectPoint(const GeometryBuffer & buff, const Vector2f & p_in, Vector2f & p_out) const
 	{
 		if (!d_matrixValid)
 			updateMatrix();
 
 
-		const GuiBgfxGeometry& gb = static_cast<const GuiBgfxGeometry&>(buff);
+		const CeguiBgfxGeometry& gb = static_cast<const CeguiBgfxGeometry&>(buff);
 
 		const float vp[4] = {
 			static_cast<float>(d_area.left()),
@@ -178,12 +178,12 @@ namespace CEGUI
 		p_out.d_x = static_cast<float>(is_x);
 		p_out.d_y = static_cast<float>(is_y);
 		//Inverse of Render view and geometry buffer then an intersect of the plain
-		//bx::mulH(input, static_cast<GuiBgfxGeometry*>(buff*) .getInvMatrix);
+		//bx::mulH(input, static_cast<CeguiBgfxGeometry*>(buff*) .getInvMatrix);
 
 	}
 
 	template <typename T>
-	void GuiBgfxRenderTarget<T>::updateMatrix() const
+	void CeguiBgfxRenderTarget<T>::updateMatrix() const
 	{
 		const int w = d_area.getWidth();
 		const int h = d_area.getHeight();

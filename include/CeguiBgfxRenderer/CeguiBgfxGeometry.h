@@ -7,16 +7,16 @@
 
 //using namespace std;
 
-//class GuiBgfxRenderer;
+//class CeguiBgfxRenderer;
 namespace CEGUI {
 
-	class GuiBgfxRenderer;
-	class GuiBgfxGeometry : public GeometryBuffer
+	class CeguiBgfxRenderer;
+	class CeguiBgfxGeometry : public GeometryBuffer
 	{
 
 	public:
-		GuiBgfxGeometry(GuiBgfxRenderer & owner);
-		~GuiBgfxGeometry();
+		CeguiBgfxGeometry(CeguiBgfxRenderer & owner);
+		~CeguiBgfxGeometry();
 
 		// Inherited via GeometryBuffer
 		virtual void draw() const override;
@@ -48,7 +48,7 @@ namespace CEGUI {
 		//! Synchronise data in the hardware buffer with what's been added
 		void syncHardwareBuffer() const;
 
-		struct GuiBgfxVertex {
+		struct CeguiBgfxVertex {
 
 			float x, y, z;
 			float u, v;
@@ -58,14 +58,14 @@ namespace CEGUI {
 		//TODO Make it so that all of the 
 		struct BatchInfo
 		{
-			const GuiBgfxTexture* texture;
+			const CeguiBgfxTexture* texture;
 			uint vertexCount;
 			bool clip;
 		};
 		//View to Draw to
 		//bgfx::ViewId view = 0;
 		//! last texture that was set as active
-		GuiBgfxTexture* d_activeTexture;
+		CeguiBgfxTexture* d_activeTexture;
 		//! whether the h/w buffer is in sync with the added geometry
 		mutable bool d_bufferSynched;
 		//! type of container that tracks BatchInfos.
@@ -73,7 +73,7 @@ namespace CEGUI {
 		//! list of texture batches added to the geometry buffer
 		BatchList d_batches;
 		//! type of container used to queue the geometry
-		typedef std::vector<GuiBgfxVertex> VertexList;
+		typedef std::vector<CeguiBgfxVertex> VertexList;
 		//! container where added geometry is stored.
 		VertexList d_vertices;
 		//! rectangular clip region
@@ -89,7 +89,7 @@ namespace CEGUI {
 		//! RenderEffect that will be used by the GeometryBuffer
 		RenderEffect* d_effect;
 
-		GuiBgfxRenderer& owner;
+		CeguiBgfxRenderer& owner;
 
 		bgfx::VertexLayout vertexLayout;
 

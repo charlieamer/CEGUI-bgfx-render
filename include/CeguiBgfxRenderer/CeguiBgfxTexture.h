@@ -8,11 +8,11 @@
 namespace CEGUI 
 {
 
-	class GuiBgfxTexture : public Texture
+	class CeguiBgfxTexture : public Texture
 	{
 	public:
-		GuiBgfxTexture(String name);
-		~GuiBgfxTexture();
+		CeguiBgfxTexture(String name);
+		~CeguiBgfxTexture();
 
 		// Inherited via Texture
 		virtual const String & getName() const override;

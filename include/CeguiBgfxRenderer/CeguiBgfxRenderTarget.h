@@ -6,12 +6,12 @@
 namespace CEGUI
 {
 	template <typename T = RenderTarget>
-	class GuiBgfxRenderTarget : public T
+	class CeguiBgfxRenderTarget : public T
 	{
 
 	public:
-		GuiBgfxRenderTarget(GuiBgfxRenderer& owner);
-		//~GuiBgfxRenderTarget();
+		CeguiBgfxRenderTarget(CeguiBgfxRenderer& owner);
+		//~CeguiBgfxRenderTarget();
 
 		virtual void destroy() {}
 
@@ -31,7 +31,7 @@ namespace CEGUI
 		//! helper that initialises the cached matrix
 		virtual void updateMatrix() const;
 
-		GuiBgfxRenderer& d_owner;
+		CeguiBgfxRenderer& d_owner;
 		uint8_t d_viewId = 0;
 
 		Rectf d_area;

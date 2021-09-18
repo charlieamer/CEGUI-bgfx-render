@@ -3,20 +3,20 @@
 
 namespace CEGUI 
 {
-	CEGUI::GuiBgfxViewportTarget::GuiBgfxViewportTarget(GuiBgfxRenderer & owner) :
-		GuiBgfxRenderTarget<>(owner)
+	CEGUI::CeguiBgfxViewportTarget::CeguiBgfxViewportTarget(CeguiBgfxRenderer & owner) :
+		CeguiBgfxRenderTarget<>(owner)
 	{
 		const bgfx::Stats* stats = bgfx::getStats();
 		Rectf init_area(Vector2f(0,0),
 						Sizef(stats->width, stats->height));
 		setArea(init_area);
 	}
-	GuiBgfxViewportTarget::GuiBgfxViewportTarget(GuiBgfxRenderer & owner, const Rectf & area) :
-		GuiBgfxRenderTarget<>(owner)
+	CeguiBgfxViewportTarget::CeguiBgfxViewportTarget(CeguiBgfxRenderer & owner, const Rectf & area) :
+		CeguiBgfxRenderTarget<>(owner)
 	{
 		setArea(area);
 	}
-	bool GuiBgfxViewportTarget::isImageryCache() const
+	bool CeguiBgfxViewportTarget::isImageryCache() const
 	{
 		return false;
 	}

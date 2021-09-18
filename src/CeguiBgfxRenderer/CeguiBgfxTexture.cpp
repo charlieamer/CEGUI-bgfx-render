@@ -4,38 +4,38 @@
 namespace CEGUI
 {
 
-	GuiBgfxTexture::GuiBgfxTexture(String name)
+	CeguiBgfxTexture::CeguiBgfxTexture(String name)
 	{
 		this->name = name;
 		handle = BGFX_INVALID_HANDLE;
 	}
 
-	GuiBgfxTexture::~GuiBgfxTexture()
+	CeguiBgfxTexture::~CeguiBgfxTexture()
 	{
     destroy();
 	}
 
-	const String &GuiBgfxTexture::getName() const
+	const String &CeguiBgfxTexture::getName() const
 	{
 		return name;
 	}
 
-	const Sizef &GuiBgfxTexture::getSize() const
+	const Sizef &CeguiBgfxTexture::getSize() const
 	{
 		return size;
 	}
 
-	const Sizef &GuiBgfxTexture::getOriginalDataSize() const
+	const Sizef &CeguiBgfxTexture::getOriginalDataSize() const
 	{
 		return size;
 	}
 
-	const Vector2f &GuiBgfxTexture::getTexelScaling() const
+	const Vector2f &CeguiBgfxTexture::getTexelScaling() const
 	{
 		return texel;
 	}
 
-	void GuiBgfxTexture::loadFromFile(const String &filename, const String &resourceGroup)
+	void CeguiBgfxTexture::loadFromFile(const String &filename, const String &resourceGroup)
 	{
 		// Note from PDT:
 		// There is somewhat tight coupling here between OpenGLTexture and the
@@ -66,7 +66,7 @@ namespace CEGUI
 				" failed to load image '" + filename + "'."));
 	}
 
-	void GuiBgfxTexture::loadFromMemory(const void *buffer, const Sizef &buffer_size, PixelFormat pixel_format)
+	void CeguiBgfxTexture::loadFromMemory(const void *buffer, const Sizef &buffer_size, PixelFormat pixel_format)
 	{
 		setSize(buffer_size);
 
@@ -96,7 +96,7 @@ namespace CEGUI
 		loadFromMemory(mem, buffer_size, format);
 	}
 
-	void GuiBgfxTexture::loadFromMemory(const bgfx::Memory *mem, const Sizef &buffer_size, bgfx::TextureFormat::Enum format)
+	void CeguiBgfxTexture::loadFromMemory(const bgfx::Memory *mem, const Sizef &buffer_size, bgfx::TextureFormat::Enum format)
 	{
 		handle = bgfx::createTexture2D(
 			uint16_t(buffer_size.d_width)
@@ -109,7 +109,7 @@ namespace CEGUI
 		);
 	}
 
-	void GuiBgfxTexture::blitFromMemory(const void *sourceData, const Rectf &area)
+	void CeguiBgfxTexture::blitFromMemory(const void *sourceData, const Rectf &area)
 	{
 		bgfx::updateTexture2D(handle, 0, 0,
 							  area.d_min.d_x, area.d_min.d_y,
@@ -117,17 +117,17 @@ namespace CEGUI
 							  bgfx::makeRef(sourceData, size.d_width * size.d_height));
 	}
 
-	void GuiBgfxTexture::blitToMemory(void *targetData)
+	void CeguiBgfxTexture::blitToMemory(void *targetData)
 	{
 		bgfx::readTexture(handle, targetData);
 	}
 
-	bool GuiBgfxTexture::isPixelFormatSupported(const PixelFormat fmt) const
+	bool CeguiBgfxTexture::isPixelFormatSupported(const PixelFormat fmt) const
 	{
 		return true;
 	}
 
-	void GuiBgfxTexture::destroy()
+	void CeguiBgfxTexture::destroy()
 	{
 		if (handle.idx != bgfx::kInvalidHandle)
 		{
@@ -136,15 +136,15 @@ namespace CEGUI
       Logger::getSingleton().logEvent(tmp);
 
 			bgfx::destroy(handle);
-			delete[] data;
+			// delete[] data;
 		}
 	}
-	bgfx::TextureHandle GuiBgfxTexture::getHandle() const
+	bgfx::TextureHandle CeguiBgfxTexture::getHandle() const
 	{
 		return handle;
 	}
 
-	void GuiBgfxTexture::setSize(const Sizef &value)
+	void CeguiBgfxTexture::setSize(const Sizef &value)
 	{
 		size = value;
 		texel = Vector2f(1.0f / size.d_width, 1.0f / size.d_height);

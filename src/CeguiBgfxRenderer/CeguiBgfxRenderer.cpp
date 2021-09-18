@@ -38,9 +38,9 @@ namespace CEGUI
 	}
 
 
-	GuiBgfxRenderer::GuiBgfxRenderer()
+	CeguiBgfxRenderer::CeguiBgfxRenderer()
 	{
-		//d_renderBuffers.push_back(new GuiBgfxRenderTarget(*this));
+		//d_renderBuffers.push_back(new CeguiBgfxRenderTarget(*this));
 		const bgfx::Stats* temp = bgfx::getStats();
 
 		bgfx::ShaderHandle vsh = loadShader(vs_textured_bin, "CEGUI VS Textured");
@@ -54,23 +54,23 @@ namespace CEGUI
 		
 
 		//screenArea ;
-		d_defaultTarget = new GuiBgfxViewportTarget(*this);
+		d_defaultTarget = new CeguiBgfxViewportTarget(*this);
 	}
 
-	GuiBgfxRenderer & GuiBgfxRenderer::bootstrapSystem()
+	CeguiBgfxRenderer & CeguiBgfxRenderer::bootstrapSystem()
 	{
-		GuiBgfxRenderer& renderer(create());
+		CeguiBgfxRenderer& renderer(create());
 
 		DefaultResourceProvider* rp = new DefaultResourceProvider();
 		System::create(renderer, rp);
 		return renderer;
 	}
 
-	GuiBgfxRenderer& GuiBgfxRenderer::create() {
-		return *new GuiBgfxRenderer();
+	CeguiBgfxRenderer& CeguiBgfxRenderer::create() {
+		return *new CeguiBgfxRenderer();
 	}
 
-	void GuiBgfxRenderer::destroy()
+	void CeguiBgfxRenderer::destroy()
 	{
 		destroyAllGeometryBuffers();
 		destroyAllTextures();
@@ -80,7 +80,7 @@ namespace CEGUI
 		delete this;
 	}
 
-	void GuiBgfxRenderer::updateScreenSize(int width, int height)
+	void CeguiBgfxRenderer::updateScreenSize(int width, int height)
 	{
 		d_displaySize = Sizef(width, height);
 		if(d_defaultTarget != nullptr){
@@ -96,24 +96,24 @@ namespace CEGUI
 		}
 	}
 
-	GuiBgfxRenderer::~GuiBgfxRenderer()
+	CeguiBgfxRenderer::~CeguiBgfxRenderer()
 	{
 	}
 
-	RenderTarget & GuiBgfxRenderer::getDefaultRenderTarget()
+	RenderTarget & CeguiBgfxRenderer::getDefaultRenderTarget()
 	{
 		return *d_defaultTarget;
 	}
 
-	GeometryBuffer & GuiBgfxRenderer::createGeometryBuffer()
+	GeometryBuffer & CeguiBgfxRenderer::createGeometryBuffer()
 	{
-		GuiBgfxGeometry* ret = new GuiBgfxGeometry(*this);
+		CeguiBgfxGeometry* ret = new CeguiBgfxGeometry(*this);
 		d_geometryBuffers.push_back(ret);
 		ret->setProgramHandle(d_program, d_textureUniform);
 		return *ret;
 	}
 
-	void GuiBgfxRenderer::destroyGeometryBuffer(const GeometryBuffer & buffer)
+	void CeguiBgfxRenderer::destroyGeometryBuffer(const GeometryBuffer & buffer)
 	{
 
 		GeometryBufferList::iterator i = std::find(d_geometryBuffers.begin(),
@@ -129,52 +129,50 @@ namespace CEGUI
 		}
 	}
 
-	void GuiBgfxRenderer::destroyAllGeometryBuffers()
+	void CeguiBgfxRenderer::destroyAllGeometryBuffers()
 	{
 		while (!d_geometryBuffers.empty())
 			destroyGeometryBuffer(**d_geometryBuffers.begin());
 	}
 
-	TextureTarget * GuiBgfxRenderer::createTextureTarget()
+	TextureTarget * CeguiBgfxRenderer::createTextureTarget()
 	{
-		//TextureTarget* t = new GuiBgfxTextureTarget();
-
-		return nullptr;
+		TextureTarget* t = new CeguiBgfxTextureTarget(*this);
 	}
 
-	void GuiBgfxRenderer::destroyTextureTarget(TextureTarget * target)
-	{
-	}
-
-	void GuiBgfxRenderer::destroyAllTextureTargets()
+	void CeguiBgfxRenderer::destroyTextureTarget(TextureTarget * target)
 	{
 	}
 
-	Texture & GuiBgfxRenderer::createTexture(const String & name)
+	void CeguiBgfxRenderer::destroyAllTextureTargets()
 	{
-		GuiBgfxTexture* ret = new GuiBgfxTexture(name);
+	}
+
+	Texture & CeguiBgfxRenderer::createTexture(const String & name)
+	{
+		CeguiBgfxTexture* ret = new CeguiBgfxTexture(name);
 		d_textures[name.c_str()] = ret;
 		return *ret;
 	}
 
-	Texture & GuiBgfxRenderer::createTexture(const String & name, const String & filename, const String & resourceGroup)
+	Texture & CeguiBgfxRenderer::createTexture(const String & name, const String & filename, const String & resourceGroup)
 	{
-		GuiBgfxTexture *ret = (GuiBgfxTexture*)&createTexture(name);
+		CeguiBgfxTexture *ret = (CeguiBgfxTexture*)&createTexture(name);
 		ret->loadFromFile(filename, resourceGroup);
 		return *ret;
 	}
 
-	Texture & GuiBgfxRenderer::createTexture(const String & name, const Sizef & size)
+	Texture & CeguiBgfxRenderer::createTexture(const String & name, const Sizef & size)
 	{
 		return createTexture(name);
 	}
 
-	void GuiBgfxRenderer::destroyTexture(Texture & texture)
+	void CeguiBgfxRenderer::destroyTexture(Texture & texture)
 	{
 		destroyTexture(texture.getName());
 	}
 
-	void GuiBgfxRenderer::destroyTexture(const String & ceguiName)
+	void CeguiBgfxRenderer::destroyTexture(const String & ceguiName)
 	{
 		std::string name = ceguiName.c_str();
 		if (d_textures.count(name) != 0) {
@@ -184,7 +182,7 @@ namespace CEGUI
 		}
 	}
 
-	void GuiBgfxRenderer::destroyAllTextures()
+	void CeguiBgfxRenderer::destroyAllTextures()
 	{
 		for (auto pair : d_textures) {
 			pair.second->destroy();
@@ -193,23 +191,23 @@ namespace CEGUI
 		d_textures.clear();
 	}
 
-	Texture & GuiBgfxRenderer::getTexture(const String & name) const
+	Texture & CeguiBgfxRenderer::getTexture(const String & name) const
 	{
 		return *d_textures.at(name.c_str());
 	}
 
-	bool GuiBgfxRenderer::isTextureDefined(const String & name) const
+	bool CeguiBgfxRenderer::isTextureDefined(const String & name) const
 	{
 		return d_textures.count(name.c_str()) > 0;
 	}
 
-	void GuiBgfxRenderer::beginRendering()
+	void CeguiBgfxRenderer::beginRendering()
 	{
 		
 		//unsigned char pass = 0;
 		//d_default
 		//for (auto& target : d_renderBuffers) {
-		//	if (typeid(*target) == typeid(GuiBgfxTextureTarget)) {
+		//	if (typeid(*target) == typeid(CeguiBgfxTextureTarget)) {
 		//		target->setPassId(256 - d_renderBuffers.size() + pass++);
 		//	}
 		//	else {
@@ -218,52 +216,52 @@ namespace CEGUI
 		//}
 	}
 
-	void GuiBgfxRenderer::endRendering()
+	void CeguiBgfxRenderer::endRendering()
 	{
 	}
 
-	void GuiBgfxRenderer::setDisplaySize(const Sizef & size)
+	void CeguiBgfxRenderer::setDisplaySize(const Sizef & size)
 	{
 		updateScreenSize(size.d_width, size.d_height);
 	}
 
-	const Vector2f & GuiBgfxRenderer::getDisplayDPI() const
+	const Vector2f & CeguiBgfxRenderer::getDisplayDPI() const
 	{
 		static Vector2f tmp = Vector2f(72, 72);
 		return tmp;
 	}
 
-	uint GuiBgfxRenderer::getMaxTextureSize() const
+	uint CeguiBgfxRenderer::getMaxTextureSize() const
 	{
 		auto caps = bgfx::getCaps();
 		return caps->limits.maxTextureSize;
 	}
 
-	const String & GuiBgfxRenderer::getIdentifierString() const
+	const String & CeguiBgfxRenderer::getIdentifierString() const
 	{
 		static String tmp = "Bgfx Renderer";
 		return tmp;
 	}
 
-	//void GuiBgfxRenderer::activateTarget(GuiBgfxRenderTarget * target)
+	//void CeguiBgfxRenderer::activateTarget(CeguiBgfxRenderTarget * target)
 	//{
 	//	currentPass = target->getPassId();
 	//}
 
-	//void GuiBgfxRenderer::activateRenderTarget()
+	//void CeguiBgfxRenderer::activateRenderTarget()
 	//{
 	//	activateTarget(*d_renderBuffers.begin());
 	//}
 
-	bgfx::ViewId GuiBgfxRenderer::getViewID() const
+	bgfx::ViewId CeguiBgfxRenderer::getViewID() const
 	{
 		 return d_viewId; 
 	}
 
-	void GuiBgfxRenderer::throwIfNameExists(const String & name) const
+	void CeguiBgfxRenderer::throwIfNameExists(const String & name) const
 	{
 		throw "not yet implemented";
 	}
 }
-//template<> GuiBgfxRenderer* Singleton<GuiBgfxRenderer>::ms_Singleton = 0;
+//template<> CeguiBgfxRenderer* Singleton<CeguiBgfxRenderer>::ms_Singleton = 0;
 

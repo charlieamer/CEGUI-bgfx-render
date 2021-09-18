@@ -3,11 +3,11 @@
 #include "CEGUI/Rect.h"
 namespace CEGUI
 {
-	class GuiBgfxViewportTarget : public GuiBgfxRenderTarget<>
+	class CeguiBgfxViewportTarget : public CeguiBgfxRenderTarget<>
 	{
 	public:
-		GuiBgfxViewportTarget(GuiBgfxRenderer& owner);
-		GuiBgfxViewportTarget(GuiBgfxRenderer& owner, const Rectf& area);
+		CeguiBgfxViewportTarget(CeguiBgfxRenderer& owner);
+		CeguiBgfxViewportTarget(CeguiBgfxRenderer& owner, const Rectf& area);
 
 		bool isImageryCache() const;
 	};

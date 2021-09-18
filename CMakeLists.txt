@@ -108,25 +108,17 @@ if(CeguiBgfxRenderer_BUILD_SAMPLES)
 	add_subdirectory(external/cegui)
 
 	remove_definitions(-w) # Print all warnings
-	target_sources(CEGUISampleFramework-0.8 PRIVATE
-		${CMAKE_CURRENT_SOURCE_DIR}/src/CeguiBgfxRendererSamples/CeguiBgfxRendererSampleApp.cpp
-	)
 	target_include_directories(CEGUISampleFramework-0.8 PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include
+		${CeguiBgfxRenderer_BGFX_INCLUDE_PATH}
 	)
 	cmake_policy(SET CMP0079 NEW)
 	target_link_libraries(CEGUIOpenGLRenderer-0 GL)
 	target_link_directories(CEGUISampleFramework-0.8 PRIVATE "${glew_DIR}/../..")
 	# TODO: Automatically find if GLEW has "d" suffix (i.e. on my computer is GLEWd but by default it is GLEW)
-	target_link_libraries(CEGUISampleFramework-0.8 GLEWd pthread z)
+	target_link_libraries(CEGUISampleFramework-0.8 GLEWd pthread z CEGUIBgfxRenderer)
 	set_target_properties(CEGUITinyXML2Parser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-
 	set(CeguiBgfxRenderer_CEGUI_CONFIG_INCLUDE_PATH "${CMAKE_CURRENT_BINARY_DIR}/external/cegui/cegui/include" CACHE STRING "OVERRIDEN" FORCE)
-	# set_source_files_properties(
-	# 	external/cegui/samples_framework/src/CEGuiOpenGL3BaseApplication.cpp
-	# 	PROPERTIES COMPILE_FLAGS
-	# 	-DOpenGL3Renderer=hepek
-	# )
 endif()
 
 set(RENDERER_SOURCES
@@ -140,6 +132,23 @@ set(RENDERER_SOURCES
 add_library(CEGUIBgfxRenderer_Static STATIC ${RENDERER_SOURCES})
 if(CeguiBgfxRenderer_BUILD_SHARED)
 	add_library(CEGUIBgfxRenderer SHARED ${RENDERER_SOURCES}
+		${CeguiBgfxRenderer_BGFX_INCLUDE_PATH}/../src/amalgamated.cpp
+		${CeguiBgfxRenderer_BX_INCLUDE_PATH}/../src/amalgamated.cpp
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../src/image_decode.cpp
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../src/image_gnf.cpp
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../src/image.cpp
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/tinyexr/deps/miniz/miniz.c
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/codec.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/astc_file.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/physical_astc_block.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/logical_astc_block.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/intermediate_astc_block.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/endpoint_codec.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/footprint.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/integer_sequence_codec.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/partition.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/quantization.cc
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/src/decoder/weight_infill.cc
 	)
 endif()
 
@@ -179,7 +188,17 @@ target_include_directories(CEGUIBimgImageCodec_Static PRIVATE ${CeguiBgfxRendere
 if(CeguiBgfxRenderer_BUILD_SHARED)
 	target_include_directories(CEGUIBgfxRenderer PUBLIC ${CeguiBgfxRenderer_PUBLIC_INCLUDE_DIRS})
 	target_include_directories(CEGUIBimgImageCodec PUBLIC ${CeguiBgfxRenderer_PUBLIC_INCLUDE_DIRS})
-	target_include_directories(CEGUIBgfxRenderer PRIVATE ${CeguiBgfxRenderer_PRIVATE_INCLUDE_DIRS})
+
+	target_include_directories(CEGUIBgfxRenderer PRIVATE ${CeguiBgfxRenderer_PRIVATE_INCLUDE_DIRS}
+		${CeguiBgfxRenderer_BGFX_INCLUDE_PATH}/../3rdparty
+		${CeguiBgfxRenderer_BGFX_INCLUDE_PATH}/../3rdparty/khronos
+		${CeguiBgfxRenderer_BX_INCLUDE_PATH}/../3rdparty
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/iqa/include
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/include
+		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/tinyexr/deps/miniz
+	)
 	target_include_directories(CEGUIBimgImageCodec PRIVATE ${CeguiBgfxRenderer_PRIVATE_INCLUDE_DIRS}
 		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty
 		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/iqa/include

@@ -9,7 +9,7 @@
 namespace CEGUI
 {
 
-	void GuiBgfxGeometry::syncHardwareBuffer() const
+	void CeguiBgfxGeometry::syncHardwareBuffer() const
 	{
 		size_t sizeToInsert = 0;
 		size_t locationOfIsert = 0;
@@ -20,7 +20,7 @@ namespace CEGUI
 		d_bufferSynched = true;
 	}
 
-	GuiBgfxGeometry::GuiBgfxGeometry(GuiBgfxRenderer & renderer) : owner(renderer)
+	CeguiBgfxGeometry::CeguiBgfxGeometry(CeguiBgfxRenderer & renderer) : owner(renderer)
 	{
 		d_pivot = Vector3f(0, 0, 0);
 		d_translation = Vector3f(0, 0, 0);
@@ -37,12 +37,12 @@ namespace CEGUI
 
 	}
 
-	GuiBgfxGeometry::~GuiBgfxGeometry()
+	CeguiBgfxGeometry::~CeguiBgfxGeometry()
 	{
 		bgfx::destroy(vertexHandle);
 	}
 	float kPiHalf = 1.5707963267948966192313216916398f;
-	void GuiBgfxGeometry::updateMatrix() const
+	void CeguiBgfxGeometry::updateMatrix() const
 	{
 		bx::mtxIdentity(matrix);
 		Vector3f pivoted = d_pivot + d_translation;
@@ -61,7 +61,7 @@ namespace CEGUI
 		//bx::mtxInverse(invMatrix, matrix);
 	}
 
-	void GuiBgfxGeometry::draw() const
+	void CeguiBgfxGeometry::draw() const
 	{
 		if (!d_bufferSynched)
 			syncHardwareBuffer();
@@ -84,7 +84,7 @@ namespace CEGUI
 				bgfx::setTransform(transformCache);
 				bgfx::setVertexBuffer(0, vertexHandle, pos, i->vertexCount);
 
-				const GuiBgfxTexture* currentBatchTexture = i->texture;
+				const CeguiBgfxTexture* currentBatchTexture = i->texture;
 				if (currentBatchTexture || currentBatchTexture->getHandle().idx != bgfx::kInvalidHandle) {
 					bgfx::setTexture(0, uniform, currentBatchTexture->getHandle());
 				}
@@ -98,25 +98,25 @@ namespace CEGUI
 		}
 	}
 
-	void GuiBgfxGeometry::setTranslation(const Vector3f & v)
+	void CeguiBgfxGeometry::setTranslation(const Vector3f & v)
 	{
 		d_translation = v;
 		d_matrixValid = false;
 	}
 
-	void GuiBgfxGeometry::setRotation(const Quaternion & r)
+	void CeguiBgfxGeometry::setRotation(const Quaternion & r)
 	{
 		d_rotation = r;
 		d_matrixValid = false;
 	}
 
-	void GuiBgfxGeometry::setPivot(const Vector3f & p)
+	void CeguiBgfxGeometry::setPivot(const Vector3f & p)
 	{
 		d_pivot = p;
 		d_matrixValid = false;
 	}
 
-	void GuiBgfxGeometry::setClippingRegion(const Rectf & region)
+	void CeguiBgfxGeometry::setClippingRegion(const Rectf & region)
 	{
 		d_clipRect.top(ceguimax(0.0f, region.top()));
 		d_clipRect.bottom(ceguimax(0.0f, region.bottom()));
@@ -124,14 +124,14 @@ namespace CEGUI
 		d_clipRect.right(ceguimax(0.0f, region.right()));
 	}
 
-	void GuiBgfxGeometry::appendVertex(const Vertex & vertex)
+	void CeguiBgfxGeometry::appendVertex(const Vertex & vertex)
 	{
 		appendGeometry(&vertex, 1);
 	}
 
-	void GuiBgfxGeometry::appendGeometry(const Vertex* const vbuff, uint vertex_count)
+	void CeguiBgfxGeometry::appendGeometry(const Vertex* const vbuff, uint vertex_count)
 	{
-		GuiBgfxTexture* srv = d_activeTexture ? d_activeTexture : 0;
+		CeguiBgfxTexture* srv = d_activeTexture ? d_activeTexture : 0;
 
 		if (d_batches.empty() ||
 			srv != d_batches.back().texture ||
@@ -140,13 +140,13 @@ namespace CEGUI
 			BatchInfo batch = { srv, 0, d_clippingActive };
 			d_batches.push_back(batch);
 		}
-		GuiBgfxGeometry::GuiBgfxVertex *temp = d_vertices.data();
+		CeguiBgfxGeometry::CeguiBgfxVertex *temp = d_vertices.data();
 
 		//Keep track of batch indicies so that one can feed them into 
 		uint16_t vc = d_batches.back().vertexCount;
 		d_batches.back().vertexCount += vertex_count;
 
-		GuiBgfxVertex vd;
+		CeguiBgfxVertex vd;
 		const Vertex* vs = vbuff;
 		//Texture Verices Size	
 		String vertices;
@@ -170,59 +170,59 @@ namespace CEGUI
 	}
 
 
-	void GuiBgfxGeometry::setActiveTexture(Texture * texture)
+	void CeguiBgfxGeometry::setActiveTexture(Texture * texture)
 	{
-		this->d_activeTexture = static_cast<GuiBgfxTexture*>(texture);
+		this->d_activeTexture = static_cast<CeguiBgfxTexture*>(texture);
 	}
 
-	void GuiBgfxGeometry::reset()
+	void CeguiBgfxGeometry::reset()
 	{
 		d_batches.clear();
 		d_vertices.clear();
 		d_activeTexture = 0;
 	}
 
-	Texture * GuiBgfxGeometry::getActiveTexture() const
+	Texture * CeguiBgfxGeometry::getActiveTexture() const
 	{
 		return d_activeTexture;
 	}
 
-	uint GuiBgfxGeometry::getVertexCount() const
+	uint CeguiBgfxGeometry::getVertexCount() const
 	{
 		return d_vertices.size();
 	}
 
-	uint GuiBgfxGeometry::getBatchCount() const
+	uint CeguiBgfxGeometry::getBatchCount() const
 	{
 		return d_batches.size();
 	}
 
-	void GuiBgfxGeometry::setRenderEffect(RenderEffect * effect)
+	void CeguiBgfxGeometry::setRenderEffect(RenderEffect * effect)
 	{
 		this->d_effect = effect;
 	}
 
-	RenderEffect * GuiBgfxGeometry::getRenderEffect()
+	RenderEffect * CeguiBgfxGeometry::getRenderEffect()
 	{
 		return d_effect;
 	}
 
-	void GuiBgfxGeometry::setClippingActive(const bool active)
+	void CeguiBgfxGeometry::setClippingActive(const bool active)
 	{
 		d_clippingActive = active;
 	}
 
-	bool GuiBgfxGeometry::isClippingActive() const
+	bool CeguiBgfxGeometry::isClippingActive() const
 	{
 		return d_clippingActive;
 	}
 
-	void GuiBgfxGeometry::setProgramHandle(bgfx::ProgramHandle programHandle, bgfx::UniformHandle uniformHandle)
+	void CeguiBgfxGeometry::setProgramHandle(bgfx::ProgramHandle programHandle, bgfx::UniformHandle uniformHandle)
 	{
 		program = programHandle;
 		uniform = uniformHandle;
 	}
-	float * GuiBgfxGeometry::getMatrix() const
+	float * CeguiBgfxGeometry::getMatrix() const
 	{
 		return matrix;
 	}

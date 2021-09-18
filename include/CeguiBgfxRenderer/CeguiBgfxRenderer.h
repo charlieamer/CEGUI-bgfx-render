@@ -9,27 +9,23 @@
 #include <vector>
 #include <string>
 #include <bgfx/bgfx.h>
-//#include <GuiBgfxRenderTarget.h>
-//using namespace std;
-//TODO look into outputing 
-
 
 namespace CEGUI 
 {
-	class GuiBgfxTexture;
-	class GuiBgfxTextureTarget;
-	class GuiBgfxGeometry;
+	class CeguiBgfxTexture;
+	class CeguiBgfxTextureTarget;
+	class CeguiBgfxGeometry;
 
 
-	class GuiBgfxRenderer : public Renderer//, public Singleton<GuiBgfxRenderer>
+	class CeguiBgfxRenderer : public Renderer//, public Singleton<CeguiBgfxRenderer>
 	{
 	public:
-		static GuiBgfxRenderer& bootstrapSystem();
-		static GuiBgfxRenderer& create();
+		static CeguiBgfxRenderer& bootstrapSystem();
+		static CeguiBgfxRenderer& create();
 
 		void destroy();
 		void updateScreenSize(int width, int height);
-		~GuiBgfxRenderer();
+		~CeguiBgfxRenderer();
 
 		// Inherited via Renderer
 		virtual RenderTarget & getDefaultRenderTarget() override;
@@ -57,7 +53,7 @@ namespace CEGUI
 		virtual uint getMaxTextureSize() const override;
 		virtual const String & getIdentifierString() const override;
 
-		//void activateTarget(GuiBgfxRenderTarget* target);
+		//void activateTarget(CeguiBgfxRenderTarget* target);
 		//void activateRenderTarget();
 		 
 		bgfx::ViewId getViewID() const;
@@ -78,23 +74,23 @@ namespace CEGUI
 		//! What the renderer considers to be the current display DPI resolution.
 		Vector2f d_displayDPI;
 		//! Container type to hold texture Targets
-		typedef std::vector<GuiBgfxTexture*> TextureTargetList;
+		typedef std::vector<CeguiBgfxTexture*> TextureTargetList;
 		//! Container used to track Texture Targets
 		TextureTargetList d_textureTargets;
 		//! Container type to hold Geomitry Buffers
-		typedef std::vector<GuiBgfxGeometry*> GeometryBufferList;
+		typedef std::vector<CeguiBgfxGeometry*> GeometryBufferList;
 		//! Container used to track geomitryBuffers
 		GeometryBufferList d_geometryBuffers;
 		//! The Default RenderTareget
 		RenderTarget* d_defaultTarget = nullptr;
 
 		//! Container type to hold  render Targets
-		//typedef std::vector<GuiBgfxRenderTarget*> RenderTargetList;
+		//typedef std::vector<CeguiBgfxRenderTarget*> RenderTargetList;
 		////! Container used to track render targets
 		//RenderTargetList d_renderBuffers;
 		//! Container type to hold textures
-		typedef std::map<String, GuiBgfxTexture*, StringFastLessCompare
-					CEGUI_MAP_ALLOC(String, GuiBgfxTexture*)> TextureMap;
+		typedef std::map<String, CeguiBgfxTexture*, StringFastLessCompare
+					CEGUI_MAP_ALLOC(String, CeguiBgfxTexture*)> TextureMap;
 		
 		TextureMap d_textures;
 
@@ -103,7 +99,7 @@ namespace CEGUI
 		bgfx::ProgramHandle d_program;
 		bgfx::UniformHandle d_textureUniform;
 
-		GuiBgfxRenderer();
+		CeguiBgfxRenderer();
 
 		
 	};

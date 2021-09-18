@@ -7,46 +7,46 @@
 
 namespace CEGUI
 {
-	GuiBgfxTextureTarget::GuiBgfxTextureTarget(GuiBgfxRenderer& owner) : GuiBgfxRenderTarget(owner)
+	CeguiBgfxTextureTarget::CeguiBgfxTextureTarget(CeguiBgfxRenderer& owner) : CeguiBgfxRenderTarget(owner)
 	{
 		texture = NULL;
 	}
 
-	GuiBgfxTextureTarget::~GuiBgfxTextureTarget()
+	CeguiBgfxTextureTarget::~CeguiBgfxTextureTarget()
 	{
 	}
 
-	bool GuiBgfxTextureTarget::isImageryCache() const
+	bool CeguiBgfxTextureTarget::isImageryCache() const
 	{
 		return true;
 	}
 
-	void GuiBgfxTextureTarget::activate()
+	void CeguiBgfxTextureTarget::activate()
 	{
 		bgfx::setViewFrameBuffer(getViewId(), handle);
 	}
 
-	void GuiBgfxTextureTarget::deactivate()
+	void CeguiBgfxTextureTarget::deactivate()
 	{
 	}
 
-	void GuiBgfxTextureTarget::clear()
+	void CeguiBgfxTextureTarget::clear()
 	{
 		memset(textureMemory->data, 0, textureMemory->size);
 		bgfx::updateTexture2D(texture->getHandle(), 0, 0, 0, 0, texture->getSize().d_width, texture->getSize().d_height, textureMemory);
 	}
-	Texture & GuiBgfxTextureTarget::getTexture() const
+	Texture & CeguiBgfxTextureTarget::getTexture() const
 	{
 		return *texture;
 	}
 
-	void GuiBgfxTextureTarget::declareRenderSize(const Sizef & sz)
+	void CeguiBgfxTextureTarget::declareRenderSize(const Sizef & sz)
 	{
 		/*
 		if (texture) {
 			CEGUI_THROW(new RendererException("Texture for render target alredy initialized"));
 		}
-		texture = new GuiBgfxTexture("Texture render target");
+		texture = new CeguiBgfxTexture("Texture render target");
 		uint8_t* data = new uint8_t[sz.d_width * sz.d_height * 4];
 		textureMemory = bgfx::makeRef(data, sz.d_height * sz.d_width * 4);
 		texture->loadFromMemory(textureMemory, sz, Texture::PixelFormat::PF_RGBA);
@@ -55,12 +55,12 @@ namespace CEGUI
 		d_area = Rectf(0, 0, sz.d_width, sz.d_height);
 	}
 
-	bool GuiBgfxTextureTarget::isRenderingInverted() const
+	bool CeguiBgfxTextureTarget::isRenderingInverted() const
 	{
 		return true;
 	}
 
-	void GuiBgfxTextureTarget::destroy()
+	void CeguiBgfxTextureTarget::destroy()
 	{
 		if (texture) {
 			texture->destroy();
