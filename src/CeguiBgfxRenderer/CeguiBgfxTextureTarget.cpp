@@ -45,8 +45,12 @@ namespace CEGUI
 
 	void CeguiBgfxTextureTarget::declareRenderSize(const Sizef & sz)
 	{
-		handle = bgfx::createFrameBuffer(sz.d_width, sz.d_height, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT_WRITE_ONLY);
-		d_area = Rectf({0, 0}, sz);
+		if (sz.d_width == 0 || sz.d_height == 0) {
+			CEGUI::Logger::getSingleton().logEvent("Tried to create texture render target with size 0");
+		} else {
+			handle = bgfx::createFrameBuffer(sz.d_width, sz.d_height, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT_WRITE_ONLY);
+			d_area = Rectf({0, 0}, sz);
+		}
 	}
 
 	bool CeguiBgfxTextureTarget::isRenderingInverted() const

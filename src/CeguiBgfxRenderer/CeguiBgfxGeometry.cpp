@@ -63,6 +63,7 @@ namespace CEGUI
 
 	void CeguiBgfxGeometry::draw() const
 	{
+		return;
 		if (!d_bufferSynched)
 			syncHardwareBuffer();
 

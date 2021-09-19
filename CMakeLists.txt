@@ -95,7 +95,15 @@ if(CeguiBgfxRenderer_BUILD_SAMPLES)
 	set(CEGUI_HAS_STD11_REGEX ON CACHE BOOL "OVERRIDEN" FORCE)
 	include_directories(${CMAKE_CURRENT_BINARY_DIR}/external/cegui/samples/common/include)
 	add_definitions(-w) # Don't print any warnings. CEGUI generates a lot of them.
-	add_compile_definitions(CEGUI_USE_GLEW)
+	add_compile_definitions(CEGUI_USE_GLEW
+		BGFX_CONFIG_MULTITHREADED=0
+		BGFX_CONFIG_DEBUG=1
+		BX_CONFIG_DEBUG=1
+		BGFX_CONFIG_FORCE_EGL=1
+		BGFX_CONFIG_RENDERER_VULKAN=0
+		BGFX_CONFIG_RENDERER_OPENGL=1
+		WL_EGL_PLATFORM=1
+	)
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 	set(CEGUI_USE_GLEW ON CACHE BOOL "OVERRIDEN" FORCE)
 	set(CEGUI_GLFW_VER "3" CACHE STRING "OVERRIDEN" FORCE)
@@ -111,13 +119,13 @@ if(CeguiBgfxRenderer_BUILD_SAMPLES)
 	target_include_directories(CEGUISampleFramework-0.8 PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include
 		${CeguiBgfxRenderer_BGFX_INCLUDE_PATH}
+		${CeguiBgfxRenderer_BX_INCLUDE_PATH}
 	)
 	cmake_policy(SET CMP0079 NEW)
 	target_link_libraries(CEGUIOpenGLRenderer-0 GL)
 	target_link_directories(CEGUISampleFramework-0.8 PRIVATE "${glew_DIR}/../..")
 	# TODO: Automatically find if GLEW has "d" suffix (i.e. on my computer is GLEWd but by default it is GLEW)
 	target_link_libraries(CEGUISampleFramework-0.8 GLEWd pthread z CEGUIBgfxRenderer)
-	set_target_properties(CEGUITinyXML2Parser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 	set(CeguiBgfxRenderer_CEGUI_CONFIG_INCLUDE_PATH "${CMAKE_CURRENT_BINARY_DIR}/external/cegui/cegui/include" CACHE STRING "OVERRIDEN" FORCE)
 endif()
 
@@ -205,4 +213,7 @@ if(CeguiBgfxRenderer_BUILD_SHARED)
 		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/astc-codec/include
 		${CeguiBgfxRenderer_BIMG_INCLUDE_PATH}/../3rdparty/tinyexr/deps/miniz
 	)
+
+	target_link_directories(CEGUIBgfxRenderer PRIVATE "${glew_DIR}/../..")
+	target_link_libraries(CEGUIBgfxRenderer EGL)
 endif()

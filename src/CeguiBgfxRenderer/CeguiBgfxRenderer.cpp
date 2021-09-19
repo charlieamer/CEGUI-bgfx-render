@@ -27,31 +27,33 @@ namespace CEGUI
     return handle;
   }
 
-  CeguiBgfxRenderer::CeguiBgfxRenderer()
+  CeguiBgfxRenderer::CeguiBgfxRenderer(bool callBgfxFrame) : d_callBgfxFrame(callBgfxFrame)
   {
     const bgfx::Stats *temp = bgfx::getStats();
 
-    bgfx::ShaderHandle vsh = loadShader(vs_textured_bin, "CEGUI VS Textured");
-    bgfx::ShaderHandle fsh = loadShader(fs_textured_bin, "CEGUI FS Textured");
+    // bgfx::ShaderHandle vsh = loadShader(vs_textured_bin, "CEGUI VS Textured");
+    // bgfx::ShaderHandle fsh = loadShader(fs_textured_bin, "CEGUI FS Textured");
     d_textureUniform = bgfx::createUniform("s_texture0", bgfx::UniformType::Sampler);
+    // d_program = bgfx::createProgram(vsh, fsh, true);
 
     d_defaultTarget = new CeguiBgfxViewportTarget(*this);
     d_activeRenderTarget = d_defaultTarget;
     updateScreenSize(bgfx::getStats()->width, bgfx::getStats()->height);
   }
 
-  CeguiBgfxRenderer &CeguiBgfxRenderer::bootstrapSystem()
+  CeguiBgfxRenderer &CeguiBgfxRenderer::bootstrapSystem(bool callBgfxFrame)
   {
-    CeguiBgfxRenderer &renderer(create());
+    CeguiBgfxRenderer &renderer(create(callBgfxFrame));
 
     DefaultResourceProvider *rp = new DefaultResourceProvider();
     System::create(renderer, rp);
+    
     return renderer;
   }
 
-  CeguiBgfxRenderer &CeguiBgfxRenderer::create()
+  CeguiBgfxRenderer &CeguiBgfxRenderer::create(bool callBgfxFrame)
   {
-    return *new CeguiBgfxRenderer();
+    return *new CeguiBgfxRenderer(callBgfxFrame);
   }
 
   void CeguiBgfxRenderer::destroy()
@@ -200,10 +202,6 @@ namespace CEGUI
     return d_textures.count(name.c_str()) > 0;
   }
 
-  void CeguiBgfxRenderer::beginRendering()
-  {
-  }
-
   void CeguiBgfxRenderer::activateTarget(RenderTarget* target)
   {
     d_activeRenderTarget = target;
@@ -239,8 +237,18 @@ namespace CEGUI
     CEGUI_THROW(CEGUI::UnknownObjectException("Couldn't find appropriate class for active render target"));
   }
 
+  void CeguiBgfxRenderer::beginRendering()
+  {
+#ifdef DEBUG
+    bgfx::dbgTextPrintf(0, 1, 0x4f, "BGFX renderer works!!!");
+#endif
+  }
+
   void CeguiBgfxRenderer::endRendering()
   {
+    if (d_callBgfxFrame) {
+      bgfx::frame();
+    }
   }
 
   void CeguiBgfxRenderer::setDisplaySize(const Sizef &size)

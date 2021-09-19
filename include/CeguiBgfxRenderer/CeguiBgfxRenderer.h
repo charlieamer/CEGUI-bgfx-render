@@ -20,8 +20,8 @@ namespace CEGUI
 	class CeguiBgfxRenderer : public Renderer//, public Singleton<CeguiBgfxRenderer>
 	{
 	public:
-		static CeguiBgfxRenderer& bootstrapSystem();
-		static CeguiBgfxRenderer& create();
+		static CeguiBgfxRenderer& bootstrapSystem(bool callBgfxFrame = false);
+		static CeguiBgfxRenderer& create(bool callBgfxFrame = false);
 
 		void destroy();
 		void updateScreenSize(int width, int height);
@@ -86,7 +86,12 @@ namespace CEGUI
 
 		RenderTarget* d_activeRenderTarget;
 
-		CeguiBgfxRenderer();
+		CeguiBgfxRenderer(bool callBgfxFrame = false);
+
+		// whether or not renderer should call bgfx::frame(). You usually want to do this in 2 situations:
+		// 1. if your whole application is gui-only
+		// 2. if last thing rendered is gui ... which usually is, but you might want more control over this
+		bool d_callBgfxFrame;
 	};
 }
 #if defined(_MSC_VER)
