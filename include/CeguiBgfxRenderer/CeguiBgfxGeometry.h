@@ -50,7 +50,7 @@ namespace CEGUI {
 
 		struct CeguiBgfxVertex {
 
-			float x, y, z;
+			float x, y;
 			float u, v;
 			unsigned char a, g, b, r;
 

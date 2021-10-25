@@ -8,7 +8,7 @@
 #include "CeguiBgfxRenderer/CeguiBgfxTexture.h"
 namespace CEGUI
 {
-	class CeguiBgfxTextureTarget : /*public TextureTarget,*/ public CeguiBgfxRenderTarget<TextureTarget>
+	class CeguiBgfxTextureTarget : public CeguiBgfxRenderTarget<TextureTarget>
 	{
 		bgfx::FrameBufferHandle handle;
 	public:

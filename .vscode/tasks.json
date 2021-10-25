@@ -6,6 +6,6 @@
         "type": "shell",
         "options": {
             "cwd": "${workspaceFolder}/scripts"
-        }
+        },
     }]
 }

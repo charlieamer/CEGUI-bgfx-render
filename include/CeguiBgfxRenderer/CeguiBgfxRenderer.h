@@ -10,6 +10,9 @@
 #include <string>
 #include <bgfx/bgfx.h>
 
+#define logInfo(msg) CEGUI::Logger::getSingleton().logEvent(msg)
+#define logWarn(msg) CEGUI::Logger::getSingleton().logEvent(msg, CEGUI::LoggingLevel::Warnings)
+
 namespace CEGUI 
 {
 	class CeguiBgfxTexture;

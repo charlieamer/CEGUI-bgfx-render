@@ -1,9 +1,10 @@
 #include "CeguiBgfxRenderer/CeguiBgfxViewportTarget.h"
 #include "CEGUI/Exceptions.h"
+#include "CEGUI/Logger.h"
 
 namespace CEGUI 
 {
-	CEGUI::CeguiBgfxViewportTarget::CeguiBgfxViewportTarget(CeguiBgfxRenderer & owner) :
+	CeguiBgfxViewportTarget::CeguiBgfxViewportTarget(CeguiBgfxRenderer & owner) :
 		CeguiBgfxRenderTarget<>(owner)
 	{
 		const bgfx::Stats* stats = bgfx::getStats();
@@ -19,6 +20,13 @@ namespace CEGUI
 	bool CeguiBgfxViewportTarget::isImageryCache() const
 	{
 		return false;
+	}
+
+	void CeguiBgfxViewportTarget::activate()
+	{
+		logInfo("Activating viewport target");
+		bgfx::setViewFrameBuffer(getViewId(), BGFX_INVALID_HANDLE);
+		CeguiBgfxRenderTarget::activate();
 	}
 }
 

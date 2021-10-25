@@ -28,7 +28,7 @@ namespace CEGUI
 		d_activeTexture = NULL;
 
 		vertexLayout.begin()
-			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, true)
 			.end();
@@ -63,7 +63,6 @@ namespace CEGUI
 
 	void CeguiBgfxGeometry::draw() const
 	{
-		return;
 		if (!d_bufferSynched)
 			syncHardwareBuffer();
 
@@ -156,7 +155,7 @@ namespace CEGUI
 			//Convert from vertex to bgfx format
 			vd.x = vs->position.d_x;
 			vd.y = vs->position.d_y;
-			vd.z = vs->position.d_z;
+			// vd.z = vs->position.d_z;
 			vd.u = vs->tex_coords.d_x;
 			vd.v = vs->tex_coords.d_y;
 			vd.a = vs->colour_val.getAlpha() * 255.0f;

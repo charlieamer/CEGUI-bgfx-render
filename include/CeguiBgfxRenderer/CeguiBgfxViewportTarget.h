@@ -3,12 +3,13 @@
 #include "CEGUI/Rect.h"
 namespace CEGUI
 {
-	class CeguiBgfxViewportTarget : public CeguiBgfxRenderTarget<>
+	class CeguiBgfxViewportTarget : public CeguiBgfxRenderTarget<RenderTarget>
 	{
 	public:
 		CeguiBgfxViewportTarget(CeguiBgfxRenderer& owner);
 		CeguiBgfxViewportTarget(CeguiBgfxRenderer& owner, const Rectf& area);
 
-		bool isImageryCache() const;
+		virtual bool isImageryCache() const override;
+		virtual void activate() override;
 	};
 }

@@ -49,12 +49,6 @@ namespace CEGUI
 	}
 
 	template <typename T>
-	bool CeguiBgfxRenderTarget<T>::isImageryCache() const
-	{
-		return false;
-	}
-
-	template <typename T>
 	void CeguiBgfxRenderTarget<T>::activate()
 	{
 		d_owner.activateTarget(this);

@@ -20,7 +20,6 @@ namespace CEGUI
 		virtual void draw(const RenderQueue & queue) override;
 		virtual void setArea(const Rectf & area) override;
 		virtual const Rectf & getArea() const override;
-		virtual bool isImageryCache() const override;
 		virtual void activate() override;
 		virtual void deactivate() override;
 		virtual void unprojectPoint(const GeometryBuffer & buff, const Vector2f & p_in, Vector2f & p_out) const override;

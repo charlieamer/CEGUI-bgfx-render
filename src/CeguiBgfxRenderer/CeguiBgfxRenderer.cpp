@@ -2,11 +2,20 @@
 #include "CeguiBgfxRenderer/CeguiBgfxGeometry.h"
 #include "CeguiBgfxRenderer/CeguiBgfxTextureTarget.h"
 #include "CeguiBgfxRenderer/CeguiBgfxViewportTarget.h"
-#include "fs_textured.bin.h"
-#include "vs_textured.bin.h"
 #include <bx/file.h>
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
 #include <CEGUI/Exceptions.h>
+#include "bgfx/../../examples/common/imgui/vs_imgui_image.bin.h"
+#include "bgfx/../../examples/common/imgui/fs_imgui_image.bin.h"
+
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_imgui_image),
+	BGFX_EMBEDDED_SHADER(fs_imgui_image),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
 
 namespace CEGUI
 {
@@ -31,10 +40,13 @@ namespace CEGUI
   {
     const bgfx::Stats *temp = bgfx::getStats();
 
-    // bgfx::ShaderHandle vsh = loadShader(vs_textured_bin, "CEGUI VS Textured");
-    // bgfx::ShaderHandle fsh = loadShader(fs_textured_bin, "CEGUI FS Textured");
-    d_textureUniform = bgfx::createUniform("s_texture0", bgfx::UniformType::Sampler);
-    // d_program = bgfx::createProgram(vsh, fsh, true);
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
+    d_textureUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
+    d_program = bgfx::createProgram(
+			bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_image"),
+			bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_image"),
+      true
+    );
 
     d_defaultTarget = new CeguiBgfxViewportTarget(*this);
     d_activeRenderTarget = d_defaultTarget;
