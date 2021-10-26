@@ -1,23 +1,66 @@
-
 #include "CeguiBgfxRenderer/CeguiBgfxGeometry.h"
 #include "CeguiBgfxRenderer/CeguiBgfxRenderer.h"
 
 #include <bx/math.h>
 #include <iostream>
+#include <algorithm>
+using namespace std;
 
 
 namespace CEGUI
 {
 
-	void CeguiBgfxGeometry::syncHardwareBuffer() const
+	void CeguiBgfxGeometry::syncHardwareBuffer()
 	{
 		size_t sizeToInsert = 0;
 		size_t locationOfIsert = 0;
 		const size_t vertex_count = d_vertices.size();
 
-		bgfx::update(vertexHandle, 0, bgfx::makeRef(d_vertices.data(), sizeof(d_vertices[0]) * d_vertices.size()));
+		if (d_vertices.size() > 0) {
+			// transform each vertex on CPU. Not the best idea, but it is easiest way to
+			// embed bgfx shader to library without the need of external shader compiler
+			auto mem = bgfx::alloc(sizeof(CeguiBgfxVertex) * d_vertices.size());
+			CeguiBgfxVertex* transformedVertices = (CeguiBgfxVertex*)(void*)mem->data;
+			float tmpDest[4], tmpOrig[4] = {0, 0, 0, 1};
+			transform(d_vertices.begin(), d_vertices.end(), transformedVertices, [&tmpDest, &tmpOrig, this](CeguiBgfxVertex input)-> CeguiBgfxVertex {
+				CeguiBgfxVertex ret = input;
+				tmpOrig[0] = ret.x;
+				tmpOrig[1] = ret.y;
+				bx::vec4MulMtx(tmpDest, tmpOrig, matrix);
+				ret.x = tmpDest[0];
+				ret.y = tmpDest[1];
+				return ret;
+			});
+
+			bgfx::update(vertexHandle, 0, mem);
+		}
+		
+		if (d_vertices.size() > 0) {
+			updateIndexBuffer();
+		} else {
+			destroyIndexBuffer();
+		}
 
 		d_bufferSynched = true;
+	}
+
+	void CeguiBgfxGeometry::destroyIndexBuffer() {
+		if (bgfx::isValid(indexHandle)) {
+			bgfx::destroy(indexHandle);
+			indexHandle = BGFX_INVALID_HANDLE;
+		}
+	}
+
+	void CeguiBgfxGeometry::updateIndexBuffer() {
+		const bgfx::Memory* indices = bgfx::alloc(sizeof(uint16_t) * d_vertices.size());
+		for (uint16_t i=0; i<d_vertices.size(); i++) {
+			((uint16_t*)(void*)indices->data)[i] = i;
+		}
+		if (bgfx::isValid(indexHandle)) {
+			bgfx::update(indexHandle, 0, indices);
+		} else {
+			indexHandle = bgfx::createDynamicIndexBuffer(indices, BGFX_BUFFER_ALLOW_RESIZE);
+		}
 	}
 
 	CeguiBgfxGeometry::CeguiBgfxGeometry(CeguiBgfxRenderer & renderer) : owner(renderer)
@@ -26,50 +69,55 @@ namespace CEGUI
 		d_translation = Vector3f(0, 0, 0);
 		d_effect = NULL;
 		d_activeTexture = NULL;
+		d_matrixValid = false;
 
 		vertexLayout.begin()
-			.add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, true)
+			.add(bgfx::Attrib::Color0, 4, bgfx::AttribType::Uint8, true, false)
 			.end();
 
-		vertexHandle = bgfx::createDynamicVertexBuffer(10, vertexLayout, BGFX_BUFFER_ALLOW_RESIZE);
-
+		vertexHandle = bgfx::createDynamicVertexBuffer(0u, vertexLayout, BGFX_BUFFER_ALLOW_RESIZE);
+		indexHandle = BGFX_INVALID_HANDLE;
 	}
 
 	CeguiBgfxGeometry::~CeguiBgfxGeometry()
 	{
 		bgfx::destroy(vertexHandle);
+		destroyIndexBuffer();
 	}
-	float kPiHalf = 1.5707963267948966192313216916398f;
-	void CeguiBgfxGeometry::updateMatrix() const
+
+	void CeguiBgfxGeometry::updateMatrix()
 	{
 		bx::mtxIdentity(matrix);
 		Vector3f pivoted = d_pivot + d_translation;
 		bx::mtxTranslate(matrix, pivoted.d_x, pivoted.d_y, pivoted.d_z);
-		bx::Quaternion quat1 = bx::rotateX(kPiHalf);
-		bx::Quaternion quat{ d_rotation.d_x , d_rotation.d_y, d_rotation.d_z, d_rotation.d_w };
+
 		float tmp1[16], tmp2[16];
-		bx::mtxQuat(tmp1, quat);
+		bx::mtxQuat(tmp1, bx::Quaternion(d_rotation.d_x, d_rotation.d_y, d_rotation.d_y, d_rotation.d_w));
 		bx::mtxMul(tmp2, matrix, tmp1);
 		memcpy(matrix, tmp2, sizeof(float) * 16);
-
+		
 		bx::mtxIdentity(tmp1);
 		bx::mtxTranslate(tmp1, -d_pivot.d_x, -d_pivot.d_y, -d_pivot.d_z);
 		bx::mtxMul(tmp2, matrix, tmp1);
 		memcpy(matrix, tmp2, sizeof(float) * 16);
-		//bx::mtxInverse(invMatrix, matrix);
+
+		d_matrixValid = true;
+		d_bufferSynched = false;
 	}
 
 	void CeguiBgfxGeometry::draw() const
 	{
-		if (!d_bufferSynched)
-			syncHardwareBuffer();
-
 		if (!d_matrixValid)
-			updateMatrix();
+			(const_cast<CeguiBgfxGeometry*>(this))->updateMatrix();
 
-		uint32_t transformCache = bgfx::setTransform(matrix);
+		if (!d_bufferSynched)
+			(const_cast<CeguiBgfxGeometry*>(this))->syncHardwareBuffer();
+
+		if (!bgfx::isValid(indexHandle)) {
+			return;
+		}
 
 		const int pass_count = d_effect ? d_effect->getPassCount() : 1;
 		for (int pass = 0; pass < pass_count; ++pass) {
@@ -78,22 +126,40 @@ namespace CEGUI
 				d_effect->performPreRenderFunctions(pass);
 			//Run the batches
 			size_t pos = 0;
-			BatchList::const_iterator i = d_batches.begin();
-			for (; i != d_batches.end(); ++i)
+			for (auto& batch : d_batches)
 			{
-				bgfx::setTransform(transformCache);
-				bgfx::setVertexBuffer(0, vertexHandle, pos, i->vertexCount);
+				bgfx::setIndexBuffer(indexHandle);
+				bgfx::setVertexBuffer(0, vertexHandle, pos, batch.vertexCount);
 
-				const CeguiBgfxTexture* currentBatchTexture = i->texture;
-				if (currentBatchTexture || currentBatchTexture->getHandle().idx != bgfx::kInvalidHandle) {
+				const CeguiBgfxTexture* currentBatchTexture = batch.texture;
+				if (currentBatchTexture) {
 					bgfx::setTexture(0, uniform, currentBatchTexture->getHandle());
 				}
 				else {
 					bgfx::setTexture(0, uniform, BGFX_INVALID_HANDLE);
 				}
-				bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_BLEND_ALPHA);
+				// bgfx::setTexture(0, uniform, owner.getDebugTexture()->getHandle());
+				uint64_t blendState = 0;
+				switch (batch.blendMode) {
+				case CEGUI::BlendMode::BM_NORMAL:
+					blendState = BGFX_STATE_BLEND_FUNC_SEPARATE(
+						BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA,
+						BGFX_STATE_BLEND_INV_DST_ALPHA, BGFX_STATE_BLEND_ONE
+					);
+					break;
+				case CEGUI::BlendMode::BM_RTT_PREMULTIPLIED:
+					blendState = BGFX_STATE_BLEND_FUNC(
+						BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_INV_SRC_ALPHA
+					);
+					break;
+				}
+				uint64_t screenWritingState = 0;
+				if (owner.isViewportTheActiveTarget()) {
+					screenWritingState = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A;
+				}
+				bgfx::setState(screenWritingState | blendState);
 				bgfx::submit(owner.getActiveViewID(), program);
-				pos += i->vertexCount;
+				pos += batch.vertexCount;
 			}
 		}
 	}
@@ -131,39 +197,31 @@ namespace CEGUI
 
 	void CeguiBgfxGeometry::appendGeometry(const Vertex* const vbuff, uint vertex_count)
 	{
-		CeguiBgfxTexture* srv = d_activeTexture ? d_activeTexture : 0;
+		BatchInfo batchFromCurrentState = { d_activeTexture, 0, d_clippingActive, d_blendMode };
 
-		if (d_batches.empty() ||
-			srv != d_batches.back().texture ||
-			d_clippingActive != d_batches.back().clip)
+		if (d_batches.empty() || d_batches.back() != batchFromCurrentState)
 		{
-			BatchInfo batch = { srv, 0, d_clippingActive };
-			d_batches.push_back(batch);
+			d_batches.push_back(batchFromCurrentState);
 		}
-		CeguiBgfxGeometry::CeguiBgfxVertex *temp = d_vertices.data();
 
 		//Keep track of batch indicies so that one can feed them into 
 		uint16_t vc = d_batches.back().vertexCount;
 		d_batches.back().vertexCount += vertex_count;
 
 		CeguiBgfxVertex vd;
-		const Vertex* vs = vbuff;
-		//Texture Verices Size	
-		String vertices;
-		for (uint i = 0; i < vertex_count; ++i, ++vs)
+		for (uint i = 0; i < vertex_count; ++i)
 		{
 			//Convert from vertex to bgfx format
-			vd.x = vs->position.d_x;
-			vd.y = vs->position.d_y;
-			// vd.z = vs->position.d_z;
-			vd.u = vs->tex_coords.d_x;
-			vd.v = vs->tex_coords.d_y;
-			vd.a = vs->colour_val.getAlpha() * 255.0f;
-			vd.b = vs->colour_val.getBlue() * 255.0f;
-			vd.g = vs->colour_val.getGreen() * 255.0f;
-			vd.r = vs->colour_val.getRed() * 255.0f;
+			vd.x = vbuff[i].position.d_x;
+			vd.y = vbuff[i].position.d_y;
+			vd.z = vbuff[i].position.d_z;
+			vd.u = vbuff[i].tex_coords.d_x;
+			vd.v = vbuff[i].tex_coords.d_y;
+			vd.a = vbuff[i].colour_val.getAlpha() * 255.0f;
+			vd.b = vbuff[i].colour_val.getBlue() * 255.0f;
+			vd.g = vbuff[i].colour_val.getGreen() * 255.0f;
+			vd.r = vbuff[i].colour_val.getRed() * 255.0f;
 			d_vertices.push_back(vd);
-
 		}
 
 		d_bufferSynched = false;
@@ -179,7 +237,8 @@ namespace CEGUI
 	{
 		d_batches.clear();
 		d_vertices.clear();
-		d_activeTexture = 0;
+		d_activeTexture = nullptr;
+		d_bufferSynched = false;
 	}
 
 	Texture * CeguiBgfxGeometry::getActiveTexture() const
@@ -222,7 +281,7 @@ namespace CEGUI
 		program = programHandle;
 		uniform = uniformHandle;
 	}
-	float * CeguiBgfxGeometry::getMatrix() const
+	const float * CeguiBgfxGeometry::getMatrix() const
 	{
 		return matrix;
 	}

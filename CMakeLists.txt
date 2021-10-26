@@ -1,7 +1,7 @@
 #TODO FINISH SETTING UP CEGUI
 cmake_minimum_required (VERSION 3.8)
 project(CeguiBgfxRenderer)
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 20)
 
 function(replace_source_dir_in_file filename)
 	message("Replacing in ${filename}")
@@ -98,6 +98,7 @@ if(CeguiBgfxRenderer_BUILD_SAMPLES)
 	add_compile_definitions(CEGUI_USE_GLEW
 		BGFX_CONFIG_MULTITHREADED=0
 		BGFX_CONFIG_DEBUG=1
+		BGFX_CONFIG_PROFILER=1
 		BX_CONFIG_DEBUG=1
 		BGFX_CONFIG_FORCE_EGL=1
 		BGFX_CONFIG_RENDERER_VULKAN=0

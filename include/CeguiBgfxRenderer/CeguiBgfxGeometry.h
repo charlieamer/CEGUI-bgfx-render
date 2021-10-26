@@ -38,21 +38,24 @@ namespace CEGUI {
 
 		void setProgramHandle(bgfx::ProgramHandle programHandle, bgfx::UniformHandle uniformHandle);
 
-		float* getMatrix() const;
+		const float* getMatrix() const;
 	protected:
 		bgfx::ProgramHandle program;
 		bgfx::UniformHandle uniform;
 
 		//! update cached matrix
-		void updateMatrix() const;
+		void updateMatrix();
 		//! Synchronise data in the hardware buffer with what's been added
-		void syncHardwareBuffer() const;
+		void syncHardwareBuffer();
+
+		void destroyIndexBuffer();
+		void updateIndexBuffer();
 
 		struct CeguiBgfxVertex {
 
-			float x, y;
+			float x, y, z;
 			float u, v;
-			unsigned char a, g, b, r;
+			unsigned char r, g, b, a;
 
 		};
 		//TODO Make it so that all of the 
@@ -61,13 +64,15 @@ namespace CEGUI {
 			const CeguiBgfxTexture* texture;
 			uint vertexCount;
 			bool clip;
+			BlendMode blendMode;
+			bool operator==(const BatchInfo& other) const = default; // available in C++20
 		};
 		//View to Draw to
 		//bgfx::ViewId view = 0;
 		//! last texture that was set as active
 		CeguiBgfxTexture* d_activeTexture;
 		//! whether the h/w buffer is in sync with the added geometry
-		mutable bool d_bufferSynched;
+		bool d_bufferSynched;
 		//! type of container that tracks BatchInfos.
 		typedef std::vector<BatchInfo> BatchList;
 		//! list of texture batches added to the geometry buffer
@@ -93,13 +98,9 @@ namespace CEGUI {
 
 		bgfx::VertexLayout vertexLayout;
 
-		mutable bool d_matrixValid;
-
-		mutable float matrix[16];
-
-		mutable float invMatrix[16];
-
-		mutable bgfx::DynamicVertexBufferHandle vertexHandle;
-
+		bool d_matrixValid;
+		float matrix[16];
+		bgfx::DynamicVertexBufferHandle vertexHandle;
+		bgfx::DynamicIndexBufferHandle indexHandle;
 	};
 };

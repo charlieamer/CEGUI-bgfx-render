@@ -54,12 +54,12 @@ namespace CEGUI
 			logWarn("Tried to create texture render target with size 0");
 		} else {
 			if (bgfx::isValid(handle)) {
-				bgfx::destroy(handle);
-				logInfo("Replacing frame buffer");
-			} else {
-				logInfo("Creating frame buffer");
+				destroy();
 			}
-			handle = bgfx::createFrameBuffer(sz.d_width, sz.d_height, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT_WRITE_ONLY);
+			texture->loadFromMemory(nullptr, sz, bgfx::TextureFormat::RGBA8, BGFX_TEXTURE_RT);
+			auto textureHandle = texture->getHandle();
+			handle = bgfx::createFrameBuffer(1, &textureHandle);
+			
 			d_area = Rectf({0, 0}, sz);
 		}
 	}
@@ -74,7 +74,10 @@ namespace CEGUI
 		if (texture) {
 			texture->destroy();
 		}
-		bgfx::destroy(handle);
+		if (isValid(handle)) {
+			bgfx::destroy(handle);
+		}
+		bgfx::setViewFrameBuffer(getViewId(), BGFX_INVALID_HANDLE);
 		logInfo("Destroying texture target");
 	}
 }

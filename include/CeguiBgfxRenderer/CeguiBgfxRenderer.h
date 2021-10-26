@@ -57,9 +57,13 @@ namespace CEGUI
 		virtual const String & getIdentifierString() const override;
 
 		void activateTarget(RenderTarget* target);
+		// are we currently rendering to viewport or some texture render target
+		bool isViewportTheActiveTarget() const;
 
 		unsigned char createNewViewID();
 		unsigned char getActiveViewID();
+
+		CeguiBgfxTexture* getDebugTexture();
 
 	private:
 		//! helper to throw exception if name is already used.
@@ -88,6 +92,7 @@ namespace CEGUI
 		bgfx::UniformHandle d_textureUniform;
 
 		RenderTarget* d_activeRenderTarget;
+		CeguiBgfxTexture* d_debugTexture;
 
 		CeguiBgfxRenderer(bool callBgfxFrame = false);
 

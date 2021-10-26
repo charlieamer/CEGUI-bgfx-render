@@ -7,7 +7,6 @@ namespace CEGUI
   {
     this->name = name;
     handle = BGFX_INVALID_HANDLE;
-    data = nullptr;
   }
 
   CeguiBgfxTexture::~CeguiBgfxTexture()
@@ -68,8 +67,6 @@ namespace CEGUI
 
   void CeguiBgfxTexture::loadFromMemory(const void *buffer, const Sizef &buffer_size, PixelFormat pixel_format)
   {
-    setSize(buffer_size);
-
     char tmp[200];
     sprintf(tmp, "[CeguiBgfxTexture::loadFromMemory] Loading from memory: %dx%d (name: %s)", (int)buffer_size.d_width, (int)buffer_size.d_height, name.c_str());
     Logger::getSingleton().logEvent(tmp);
@@ -90,16 +87,17 @@ namespace CEGUI
       CEGUI_THROW(RendererException("Unsupported pixel format"));
     }
     destroy();
-    data = new unsigned char[bytes];
-    memcpy(data, buffer, bytes);
-    auto mem = bgfx::makeRef(data, bytes);
+    auto mem = bgfx::alloc(bytes);
+    memcpy(mem->data, buffer, bytes);
     loadFromMemory(mem, buffer_size, format);
   }
 
-  void CeguiBgfxTexture::loadFromMemory(const bgfx::Memory *mem, const Sizef &buffer_size, bgfx::TextureFormat::Enum format)
+  void CeguiBgfxTexture::loadFromMemory(const bgfx::Memory *mem, const Sizef &buffer_size, bgfx::TextureFormat::Enum format, uint64_t flags)
   {
+    destroy();
+    setSize(buffer_size);
     handle = bgfx::createTexture2D(
-        uint16_t(buffer_size.d_width), uint16_t(buffer_size.d_height), false, 1, format, 0, mem);
+        uint16_t(buffer_size.d_width), uint16_t(buffer_size.d_height), false, 1, format, flags, mem);
   }
 
   void CeguiBgfxTexture::blitFromMemory(const void *sourceData, const Rectf &area)
@@ -129,17 +127,12 @@ namespace CEGUI
       Logger::getSingleton().logEvent(tmp);
 
       bgfx::destroy(handle);
-      // TODO: handle this properly. Right now it crashes in samples
-      // if (data) delete[] data;
+      handle = BGFX_INVALID_HANDLE;
     }
   }
   bgfx::TextureHandle CeguiBgfxTexture::getHandle() const
   {
     return handle;
-  }
-  void CeguiBgfxTexture::setHandle(bgfx::TextureHandle newHandle)
-  {
-    handle = newHandle;
   }
 
   void CeguiBgfxTexture::setSize(const Sizef &value)

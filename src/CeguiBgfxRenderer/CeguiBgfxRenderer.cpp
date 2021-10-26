@@ -6,13 +6,13 @@
 #include <bgfx/bgfx.h>
 #include <bgfx/embedded_shader.h>
 #include <CEGUI/Exceptions.h>
-#include "bgfx/../../examples/common/imgui/vs_imgui_image.bin.h"
-#include "bgfx/../../examples/common/imgui/fs_imgui_image.bin.h"
+#include "bgfx/../../examples/common/imgui/vs_ocornut_imgui.bin.h"
+#include "bgfx/../../examples/common/imgui/fs_ocornut_imgui.bin.h"
 
 static const bgfx::EmbeddedShader s_embeddedShaders[] =
 {
-	BGFX_EMBEDDED_SHADER(vs_imgui_image),
-	BGFX_EMBEDDED_SHADER(fs_imgui_image),
+	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
 
 	BGFX_EMBEDDED_SHADER_END()
 };
@@ -43,13 +43,14 @@ namespace CEGUI
 		bgfx::RendererType::Enum type = bgfx::getRendererType();
     d_textureUniform = bgfx::createUniform("s_tex", bgfx::UniformType::Sampler);
     d_program = bgfx::createProgram(
-			bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_imgui_image"),
-			bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_imgui_image"),
+			bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_ocornut_imgui"),
+			bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_ocornut_imgui"),
       true
     );
 
     d_defaultTarget = new CeguiBgfxViewportTarget(*this);
     d_activeRenderTarget = d_defaultTarget;
+    d_debugTexture = nullptr;
     updateScreenSize(bgfx::getStats()->width, bgfx::getStats()->height);
   }
 
@@ -68,6 +69,14 @@ namespace CEGUI
     return *new CeguiBgfxRenderer(callBgfxFrame);
   }
 
+  CeguiBgfxTexture* CeguiBgfxRenderer::getDebugTexture() {
+    if (d_debugTexture == nullptr) {
+      d_debugTexture = CEGUI_NEW_AO CeguiBgfxTexture("Debug Texture");
+      d_debugTexture->loadFromFile("./debug_data/uv-maptemplate.jpg", "");
+    }
+    return d_debugTexture;
+  }
+
   void CeguiBgfxRenderer::destroy()
   {
     destroyAllGeometryBuffers();
@@ -75,6 +84,9 @@ namespace CEGUI
     destroyAllTextureTargets();
     bgfx::destroy(d_program);
     bgfx::destroy(d_textureUniform);
+    if (d_debugTexture) {
+      CEGUI_DELETE_AO d_debugTexture;
+    }
     delete this;
   }
 
@@ -247,6 +259,11 @@ namespace CEGUI
       return asTextureTarget->getViewId();
     }
     CEGUI_THROW(CEGUI::UnknownObjectException("Couldn't find appropriate class for active render target"));
+  }
+
+  bool CeguiBgfxRenderer::isViewportTheActiveTarget() const
+  {
+    return dynamic_cast<CeguiBgfxViewportTarget*>(d_activeRenderTarget) != nullptr;
   }
 
   void CeguiBgfxRenderer::beginRendering()
